@@ -62,6 +62,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .chip{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;user-select:none;font-family:'DM Sans',sans-serif;}
 .chip:hover{border-color:var(--border2);color:var(--text);}
 .chip.on-coral{border-color:var(--coral);color:var(--coral);background:rgba(232,105,74,.08);}
+.chip.on-gold{border-color:var(--gold);color:var(--gold);background:rgba(212,168,71,.08);}
 .chip.on-teal{border-color:var(--teal);color:var(--teal);background:rgba(74,184,160,.08);}
 .chip.on-gold{border-color:var(--gold);color:var(--gold);background:rgba(212,168,71,.08);}
 
@@ -147,6 +148,34 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 /* TOAST */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;z-index:9999;border:1px solid var(--border2);white-space:nowrap;pointer-events:none;}
 
+.tab.t-sasha{color:var(--gold);border-bottom-color:var(--gold);}
+.btn-gold{background:var(--gold);color:#0f0e0d;border:none;border-radius:var(--r);padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.btn-gold:hover{background:var(--gold2);}
+.btn-gold:disabled{opacity:.45;cursor:not-allowed;}
+.strategy-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;animation:fadeUp .35s ease forwards;opacity:0;margin-bottom:14px;}
+.strategy-card:last-child{margin-bottom:0;}
+.s-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.s-pillar{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0;}
+.s-pillar-israeli{background:rgba(232,105,74,.15);color:var(--coral);}
+.s-pillar-motivational{background:rgba(212,168,71,.15);color:var(--gold);}
+.s-pillar-funny{background:rgba(74,184,160,.15);color:var(--teal);}
+.s-account{font-size:9px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--surface);color:var(--text3);}
+.s-viral{font-size:11px;font-weight:600;margin-left:auto;flex-shrink:0;}
+.s-title{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;padding:0 16px;margin:12px 0 4px;}
+.s-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:11px;}
+.s-row{display:flex;flex-direction:column;gap:4px;}
+.s-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.s-val{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--text);line-height:1.6;font-weight:300;}
+.s-val-he{direction:rtl;}
+.s-copy{align-self:flex-end;background:none;border:1px solid var(--border);border-radius:5px;padding:3px 10px;color:var(--text3);font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;margin-top:-2px;}
+.s-copy:hover{border-color:var(--border2);color:var(--text2);}
+.s-copy.done{color:var(--teal);border-color:var(--teal);}
+.s-format-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:2px;}
+.s-tag{background:var(--surface);border-radius:5px;padding:3px 9px;font-size:11px;color:var(--text2);}
+.s-mika-box{background:rgba(212,168,71,.06);border:1px solid rgba(212,168,71,.2);border-radius:8px;padding:11px 13px;}
+.s-mika-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.s-mika-val{font-size:12px;color:var(--text);line-height:1.6;}
+
 /* MOBILE */
 @media(max-width:600px){
   .panel{padding:16px 12px;}
@@ -193,6 +222,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="tab t-daily" id="tab-daily" onclick="go('daily')">✦ Daily Profile</div>
     <div class="tab" id="tab-extract" onclick="go('extract')">🖼 Prompt Extractor</div>
     <div class="tab" id="tab-hasbara" onclick="go('hasbara')">🔴 Image Studio</div>
+    <div class="tab" id="tab-sasha" onclick="go('sasha')">⚡ SASHA</div>
   </div>
 
   <!-- ── DAILY PANEL ── -->
@@ -339,6 +369,44 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="hist-list" id="has-hist"></div>
   </div>
 
+
+  <!-- ── SASHA PANEL ── -->
+  <div class="panel" id="panel-sasha">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+      <div>
+        <div class="p-title">SASHA <span style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:var(--text3);letter-spacing:0;">— Strategy Director</span></div>
+        <div class="p-desc">Mika's ruthless social media strategist. Scans what's trending right now and tells you exactly what to post today — for both accounts — with every detail you need to execute immediately.</div>
+      </div>
+      <div style="background:rgba(212,168,71,0.1);border:1px solid rgba(212,168,71,0.2);border-radius:50%;width:52px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;">⚡</div>
+    </div>
+
+    <!-- Focus selector -->
+    <div class="lbl" style="margin-top:16px;">Today's focus</div>
+    <div class="chips" id="sasha-focus"></div>
+
+    <!-- Vibe selector -->
+    <div class="lbl">Content vibe</div>
+    <div class="chips" id="sasha-vibe"></div>
+
+    <!-- Optional context -->
+    <div style="margin-bottom:18px;">
+      <div class="lbl">Anything on your mind? <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — current event, mood, idea)</span></div>
+      <input class="field" type="text" id="sasha-context" placeholder="e.g. It's Yom Kippur, I saw something funny today, I want something about hustle...">
+    </div>
+
+    <div class="row">
+      <button class="btn-gold" id="sasha-btn" onclick="runSasha()"><span>⚡</span> Get Today's Strategy</button>
+      <button class="btn-ghost" onclick="document.getElementById('sasha-results').innerHTML=''">Clear</button>
+    </div>
+
+    <div class="loading" id="sasha-load"><div class="spin"></div><span id="sasha-load-txt">SASHA is scanning what's trending...</span></div>
+
+    <div id="sasha-results"></div>
+
+    <div class="hist-head"><span class="hist-title">Previous strategies</span><button class="hist-clear" onclick="clearHist('sasha')">Clear all</button></div>
+    <div class="hist-list" id="sasha-hist"></div>
+  </div>
+
 </div>
 
 <!-- SETTINGS MODAL -->
@@ -393,11 +461,26 @@ let hasbaraTone = 'cynical';
 let imgB64 = null;
 let imgType = 'image/jpeg';
 
+let sashaFocus = 'both';
+let sashaVibe = 'mix';
+let histSasha   = JSON.parse(localStorage.getItem('ms_hist_sasha')   || '[]');
 let histDaily   = JSON.parse(localStorage.getItem('ms_hist_daily')   || '[]');
 let histExtract = JSON.parse(localStorage.getItem('ms_hist_extract') || '[]');
 let histHasbara = JSON.parse(localStorage.getItem('ms_hist_hasbara') || '[]');
 
 // ── CHIP DATA ────────────────────────────────────────────
+const SASHA_FOCUS_OPTS = [
+  {v:'both',     l:'🎯 Both accounts'},
+  {v:'hasbara',  l:'🔴 Hasbara only'},
+  {v:'lifestyle', l:'✦ Lifestyle only'}
+];
+const SASHA_VIBE_OPTS = [
+  {v:'mix',          l:'🎲 Surprise me'},
+  {v:'israeli',      l:'🇮🇱 Unapologetically Israeli'},
+  {v:'motivational', l:'💥 Real-talk motivational'},
+  {v:'funny',        l:'😂 Funny / relatable'},
+  {v:'trending',     l:'📈 Whatever is trending today'}
+];
 const DAILY_MOOD_OPTS = [
   {v:'none',l:'✦ No mood / natural'},
   {v:'thinking',l:'🤔 Thinking'},{v:'serious',l:'😐 Serious'},{v:'proud',l:'💪 Proud'},
@@ -541,6 +624,8 @@ function loadSettings() {
 
 // ── BUILD CHIPS ──────────────────────────────────────────
 function buildChips() {
+  mkChips('sasha-focus', SASHA_FOCUS_OPTS, 'both',  'on-gold', v => sashaFocus = v);
+  mkChips('sasha-vibe',  SASHA_VIBE_OPTS,  'mix',   'on-gold', v => sashaVibe = v);
   mkChips('daily-mood',   DAILY_MOOD_OPTS, 'none',    'on-teal',  v => dailyMood = v);
   mkChips('daily-hair',   HAIR_OPTS,       'default', 'on-teal',  v => dailyHair = v);
   mkChips('daily-outfit', OUTFIT_OPTS,     'auto',    'on-teal',  v => dailyOutfit = v);
@@ -573,7 +658,7 @@ function mkChips(containerId, opts, defaultVal, activeClass, setter) {
 
 // ── TAB SWITCHING ────────────────────────────────────────
 function go(tab) {
-  ['daily','extract','hasbara'].forEach(t => {
+  ['daily','extract','hasbara','sasha'].forEach(t => {
     document.getElementById('panel-' + t).classList.toggle('active', t === tab);
     const el = document.getElementById('tab-' + t);
     el.className = 'tab' + (t === tab ? ' t-' + t : '');
@@ -932,6 +1017,13 @@ function renderAllHist() {
     clearR('hasbara'); renderHasbaraData(document.getElementById('has-results'), e.data);
     document.getElementById('has-results').scrollIntoView({ behavior:'smooth', block:'start' });
   }, h => h.topic || 'Generation');
+
+  renderHist('sasha-hist', histSasha, 'gold', i => {
+    const e = histSasha[i]; if (!e?.ideas) return;
+    document.getElementById('sasha-results').innerHTML = '';
+    renderSasha(document.getElementById('sasha-results'), e.ideas);
+    document.getElementById('sasha-results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, h => h.vibe + ' · ' + h.focus);
 }
 
 function renderHist(elId, arr, color, onClick, labelFn) {
@@ -952,6 +1044,7 @@ function clearHist(tab) {
   if (tab === 'daily')   { histDaily = [];   localStorage.removeItem('ms_hist_daily'); }
   if (tab === 'extract') { histExtract = []; localStorage.removeItem('ms_hist_extract'); }
   if (tab === 'hasbara') { histHasbara = []; localStorage.removeItem('ms_hist_hasbara'); }
+  if (tab === 'sasha')   { histSasha = [];   localStorage.removeItem('ms_hist_sasha'); }
   renderAllHist();
 }
 
@@ -982,6 +1075,267 @@ function saveSettings() {
 // ── UTIL ─────────────────────────────────────────────────
 function errCard(msg) {
   return `<div style="padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);color:var(--text2);font-size:12px;line-height:1.7">${escH(msg)}</div>`;
+}
+
+// ── SASHA STRATEGY AGENT ────────────────────────────────
+async function runSasha() {
+  if (!KEY) { alert('No API key'); return; }
+  const btn = document.getElementById('sasha-btn');
+  const load = document.getElementById('sasha-load');
+  const loadTxt = document.getElementById('sasha-load-txt');
+  const res = document.getElementById('sasha-results');
+  btn.disabled = true; load.classList.add('show');
+  loadTxt.textContent = 'SASHA is scanning what\'s trending...';
+
+  const context = document.getElementById('sasha-context').value.trim();
+  const focusMap = { both: 'both the Hasbara/advocacy account AND the lifestyle account', hasbara: 'the Hasbara/advocacy account only', lifestyle: 'the lifestyle account only' };
+  const vibeMap = {
+    mix: 'a mix of all three pillars — Israeli, motivational, and funny',
+    israeli: 'the Unapologetically Israeli pillar — confident, proud, a little sarcastic about how Israel is treated',
+    motivational: 'the Real-talk motivational pillar — sharp, no-nonsense life/work wisdom',
+    funny: 'the Funny/relatable pillar — observational humor about life, being Israeli, being a woman',
+    trending: 'whatever is genuinely trending right now that fits Mika\'s brand'
+  };
+
+  const system = `You are SASHA — a ruthless, brilliant social media strategist specializing in AI influencer accounts. You are direct, opinionated, and never vague. You only give ideas that can be executed TODAY.
+
+You manage two Instagram/TikTok accounts for Mika — an AI-generated Israeli woman character:
+
+ACCOUNT 1 — HASBARA/ADVOCACY (30K followers)
+Purpose: Israeli perspective, unapologetic pride, sharp wit about how Israel/Jews are treated globally. NOT angry or attacking — confident, funny, unbothered.
+Content style: Mika + one bold sentence. Provocative but clever. Makes the audience feel proud and seen.
+Examples of the tone: "Woke up Israeli. Decided it\'s going to be a good day anyway 🤷‍♀️" / "If being Jewish offends you, that's a you problem." / "They've been trying to cancel us for 3000 years. We're still here."
+
+ACCOUNT 2 — LIFESTYLE (growing)
+Purpose: AI girl living in Israel. Unapologetically beautiful, real-talk motivational, funny and relatable.
+Niche: Beautiful AI + sharp attitude + Israeli identity. NOT just another pretty AI account.
+Content pillars: Unapologetically Israeli / Real-talk motivational / Funny & relatable
+
+MIKA'S PRODUCTION CONSTRAINTS:
+- Images: generated with Nano Banana (Google Imagen 3) — high quality stills
+- Videos: KLING3 animations — SHORT only (3-10 seconds max). Use sparingly.
+- Formats available: Single image post / Carousel (3-7 images) / Short Reel (image + 3-10 sec animation)
+- Posting frequency: on-demand, not daily
+
+CONTENT RULES (NEVER break these):
+- Max ONE sentence of text overlaid on the image — short, punchy, no explanation needed
+- Confident and funny beats politically aggressive — algorithm suppresses attack content
+- Every idea must work visually with a beautiful AI woman
+- Always tell me EXACTLY which mood + setting to use in Mika Studio to generate the image
+- Hashtags: 5-8 only, highly relevant, mix of big and niche
+
+ISRAEL TONE RULE (CRITICAL): Always portray Israel and life in Israel positively, warmly, and proudly. Never frame Israel negatively even in a sarcastic or ironic way. The audience should feel good about being Israeli or connected to Israel. Sarcasm and wit should be directed outward (at critics, at absurdity) — never inward at Israel itself.
+
+CAMERA & REALISM RULES (CRITICAL — Mika must not look AI-generated):
+- CLOSE-UP or MEDIUM-CLOSE framing only — face and shoulders. Never wide shots or full body that reveal too much background.
+- Background always BLURRED bokeh — never sharp CGI-looking backgrounds
+- Lighting: natural and imperfect — window light, golden hour, café warmth. Never studio lighting.
+- Angle: slightly off-center, candid, iPhone-style — not perfectly composed
+- Environment: lived-in feel — small imperfections, not staged
+- The nano prompts you generate MUST include all of these details explicitly — do not leave them vague
+
+TEXT OVERLAY RULES for nano_prompt: Always embed BOTH the English AND Hebrew hook text into the Nano Banana prompt. Place them as two lines of overlaid text — English on top, Hebrew below (or vice versa). White bold sans-serif font, positioned in lower third or upper third (never covering Mika\'s face), semi-transparent dark backdrop for contrast, large enough to read immediately on mobile.
+
+CRITICAL OUTPUT RULE: You MUST respond with ONLY a raw JSON array. No intro text, no "here's what I found", no markdown, no explanation before or after. Your ENTIRE response must be parseable as JSON. Start your response with [ and end with ]. Nothing else.
+
+[
+  {
+    "pillar": "israeli" or "motivational" or "funny",
+    "account": "hasbara" or "lifestyle" or "both",
+    "viral_score": "🔥🔥🔥" or "🔥🔥" or "🔥" (your honest viral potential rating),
+    "format": "single post" or "carousel" or "short reel",
+    "hook_en": "The bold sentence in English that goes ON the image",
+    "hook_he": "Same sentence in Hebrew",
+    "why_it_works": "One sentence — why this will perform",
+    "caption_en": "Full Instagram caption in English (1-3 sentences max + call to action)",
+    "caption_he": "Same caption in Hebrew",
+    "hashtags": "#tag1 #tag2 #tag3 #tag4 #tag5",
+    "mika_studio": {
+      "mood": "one of: thinking / serious / proud / sarcastic / shocked / smiling / assertive / happy / relaxed",
+      "setting": "one of: neutral / israel-street / beach / cafe / rooftop / market / bedroom / kitchen",
+      "hair": "one of: default / ponytail / wavy / half-up / messy-bun / high-bun",
+      "outfit": "describe briefly what Mika should wear"
+    },
+    "nano_prompt_with_text": "Complete Nano Banana image generation prompt WITH text overlay. You MUST follow this exact recipe: MIKA APPEARANCE (always include verbatim): 175cm tall young woman in her mid-20s, long straight blonde hair with lighter highlights, blue-green eyes, light skin with very subtle freckles on nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. Always wearing a delicate gold necklace with a small Magen David (Star of David) pendant clearly visible.  AUTHENTICITY RECIPE (always apply — this is what makes her look real, not AI): - Frame: CLOSE-UP or MEDIUM-CLOSE only — face and shoulders, or face and upper chest. Never wide/full-body shots. - Background: blurred shallow depth of field (bokeh) — background suggests the location but is never sharp or detailed - Lighting: natural, uneven, slightly imperfect — window light, golden hour sun, café ambient warmth. A touch of overexposure or slight shadow is good. Never flat even studio lighting. - Angle: slightly imperfect, as if taken on an iPhone by herself or a friend. Off-center is good. Never perfectly centered magazine composition. - Environment feel: lived-in and real — if indoors, there may be a small item out of place, a half-drunk coffee, a phone charger. Not staged. - Overall: the image must look like a real candid iPhone photo posted to Instagram — NOT a studio shoot, NOT an AI render, NOT a fashion editorial. THEN add: chosen hair style from mika_studio settings, chosen outfit, chosen mood/expression and body language, specific location/setting (close-up framing, blurred background). FINALLY add TEXT OVERLAY: two lines of bold white sans-serif text — English hook sentence on top line, Hebrew hook sentence on second line — positioned in lower third of image, semi-transparent dark backdrop behind text, never overlapping Mika face.",
+    "nano_prompt_clean": "Identical to nano_prompt_with_text but with the TEXT OVERLAY section completely removed — pure clean Mika image the user will add text to manually",
+    "kling_prompt": "KLING3 animation prompt — 3-5 seconds of subtle natural movement matching the mood and setting. Even for static posts include this so it can become a reel",
+    "trending_angle": "What current trend or moment this taps into"
+  }
+]`;
+
+  const savedRooms = {
+    bedroom: localStorage.getItem('ms_bed') || 'Modern warm apartment bedroom. Light oak bed frame, white linen, warm pendant light, sheer curtains, slightly lived-in.',
+    kitchen: localStorage.getItem('ms_kit') || 'Open plan Israeli apartment kitchen. White cabinets, light wood countertop, espresso machine. Authentic not staged.',
+    living_room: localStorage.getItem('ms_sal') || "Mika apartment living room. Cozy beige sofa, flat screen TV on wall, low oak coffee table, warm lighting, cream walls, plant in corner.",
+    bathroom: localStorage.getItem('ms_bath') || 'Small modern Israeli bathroom. White tiles, frameless mirror, skincare products on counter, warm vanity light.'
+  };
+  const char = getChar();
+  const userMsg = `Focus: ${focusMap[sashaFocus] || focusMap.both}
+Vibe today: ${vibeMap[sashaVibe] || vibeMap.mix}
+${context ? 'Extra context: ' + context : 'No extra context — use your judgment.'}
+
+Mika character: ${char}
+
+Saved home environments (use EXACTLY in nano prompts for indoor settings):
+Bedroom: ${savedRooms.bedroom}
+Kitchen: ${savedRooms.kitchen}
+Living room: ${savedRooms.living_room}
+Bathroom: ${savedRooms.bathroom}
+
+Search the web first for trending Israel, Jewish, AI content, motivational content. Then give 3 content ideas.`;
+
+  try {
+    loadTxt.textContent = 'Scanning trending topics...';
+    const raw = await api(system, userMsg, true);
+    loadTxt.textContent = 'Building your strategy...';
+
+    // If Claude returned prose + JSON, extract the JSON part
+    let jsonRaw = raw;
+    const arrStart = raw.indexOf('[');
+    const arrEnd = raw.lastIndexOf(']');
+    if (arrStart !== -1 && arrEnd > arrStart) {
+      jsonRaw = raw.slice(arrStart, arrEnd + 1);
+    }
+
+    const ideas = parseJSON(jsonRaw, true);
+    if (!Array.isArray(ideas) || ideas.length === 0) throw new Error('No ideas returned');
+
+    const entry = { date: now(), focus: sashaFocus, vibe: sashaVibe, ideas };
+    histSasha.unshift(entry); if (histSasha.length > 15) histSasha.pop();
+    localStorage.setItem('ms_hist_sasha', JSON.stringify(histSasha));
+
+    renderSasha(res, ideas);
+    renderAllHist();
+  } catch(e) {
+    // If parse failed, try one more time with a strict re-prompt
+    if (e.message.includes('parse') || e.message.includes('JSON')) {
+      try {
+        loadTxt.textContent = 'Retrying with strict JSON format...';
+        const retryMsg = userMsg + '\n\nIMPORTANT: Your previous response was not valid JSON. This time respond with ONLY the JSON array starting with [ and ending with ]. Zero other text.';
+        const raw2 = await api(system, retryMsg, false);
+        const arrStart2 = raw2.indexOf('[');
+        const arrEnd2 = raw2.lastIndexOf(']');
+        const jsonRaw2 = arrStart2 !== -1 ? raw2.slice(arrStart2, arrEnd2 + 1) : raw2;
+        const ideas2 = parseJSON(jsonRaw2, true);
+        if (Array.isArray(ideas2) && ideas2.length > 0) {
+          const entry2 = { date: now(), focus: sashaFocus, vibe: sashaVibe, ideas: ideas2 };
+          histSasha.unshift(entry2); if (histSasha.length > 15) histSasha.pop();
+          localStorage.setItem('ms_hist_sasha', JSON.stringify(histSasha));
+          renderSasha(res, ideas2);
+          renderAllHist();
+          btn.disabled = false; load.classList.remove('show');
+          return;
+        }
+      } catch(e2) {}
+    }
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+const _sashaPrompts = {};
+
+function copySashaPrompt(btn, idx, variant) {
+  const p = _sashaPrompts[idx];
+  if (!p) return;
+  const txt = variant === 'with' ? (p.with || p.clean || '') : (p.clean || p.with || '');
+  copyTxt(btn, txt);
+}
+
+function renderSasha(container, ideas) {
+  container.innerHTML = '';
+  const pillarClass = { israeli: 's-pillar-israeli', motivational: 's-pillar-motivational', funny: 's-pillar-funny' };
+  const pillarLabel = { israeli: '🇮🇱 Israeli', motivational: '💥 Motivational', funny: '😂 Funny' };
+  const accountLabel = { hasbara: 'Hasbara', lifestyle: 'Lifestyle', both: 'Both accounts' };
+
+  ideas.forEach((idea, i) => {
+    // Store prompts for copy buttons
+    _sashaPrompts[i] = {
+      with: idea.nano_prompt_with_text || idea.nano_prompt || '',
+      clean: idea.nano_prompt_clean || idea.nano_prompt || ''
+    };
+
+    const card = document.createElement('div');
+    card.className = 'strategy-card';
+    card.style.animationDelay = (i * 0.1) + 's';
+
+    const ms = idea.mika_studio || {};
+    const mikaDetails = [
+      ms.mood && 'Mood: ' + ms.mood,
+      ms.setting && 'Setting: ' + ms.setting,
+      ms.hair && 'Hair: ' + ms.hair,
+      ms.outfit && 'Outfit: ' + ms.outfit
+    ].filter(Boolean).join(' · ');
+
+    card.innerHTML = `
+      <div class="s-head">
+        <span class="s-pillar ${pillarClass[idea.pillar] || 's-pillar-motivational'}">${pillarLabel[idea.pillar] || idea.pillar}</span>
+        <span class="s-account">${accountLabel[idea.account] || idea.account}</span>
+        <span class="s-account" style="background:rgba(74,184,160,.1);color:var(--teal)">${idea.format || 'post'}</span>
+        <span class="s-viral">${idea.viral_score || '🔥'}</span>
+      </div>
+      <div class="s-title">${escH(idea.why_it_works || '')}</div>
+      <div class="s-body">
+
+        <div class="s-row">
+          <div class="s-label" style="color:var(--gold)">Text on image</div>
+          <div style="background:#111;border-radius:8px;padding:18px 16px;position:relative;overflow:hidden;margin-bottom:2px;">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);pointer-events:none;border-radius:8px;"></div>
+            <div style="font-size:18px;font-weight:700;color:#fff;text-align:center;line-height:1.3;letter-spacing:-.2px;text-shadow:0 2px 8px rgba(0,0,0,.8);position:relative;z-index:1;">${escH(idea.hook_en || '')}</div>
+            <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;margin-top:6px;direction:rtl;position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.8);">${escH(idea.hook_he || '')}</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hook_en||'')}')">Copy EN</button>
+            <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hook_he||'')}')">Copy HE</button>
+          </div>
+        </div>
+
+        <div class="s-row">
+          <div class="s-label" style="color:var(--coral)">Caption (EN)</div>
+          <div class="s-val">${escH(idea.caption_en || '')}</div>
+          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.caption_en||'')}')">Copy</button>
+        </div>
+
+        <div class="s-row">
+          <div class="s-label" style="color:var(--coral)">Caption (HE)</div>
+          <div class="s-val s-val-he">${escH(idea.caption_he || '')}</div>
+          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.caption_he||'')}')">Copy</button>
+        </div>
+
+        <div class="s-row">
+          <div class="s-label">Hashtags</div>
+          <div class="s-val">${escH(idea.hashtags || '')}</div>
+          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hashtags||'')}')">Copy</button>
+        </div>
+
+        ${idea.trending_angle ? `<div class="s-row">
+          <div class="s-label">Trending angle</div>
+          <div class="s-val" style="color:var(--text2);font-style:italic">${escH(idea.trending_angle)}</div>
+        </div>` : ''}
+
+        <div class="s-mika-box">
+          <div class="s-mika-label">⚡ Mika Studio settings</div>
+          <div class="s-mika-val">${escH(mikaDetails)}</div>
+        </div>
+
+        <div class="s-row">
+          <div class="s-label" style="color:var(--gold)">Nano Banana prompts</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+            <button class="s-copy" style="padding:6px 13px;font-size:11px;border-color:var(--gold);color:var(--gold);" onclick="copySashaPrompt(this,${i},'with')">Copy WITH text overlay</button>
+            <button class="s-copy" style="padding:6px 13px;font-size:11px;" onclick="copySashaPrompt(this,${i},'clean')">Copy WITHOUT text</button>
+          </div>
+          <div class="s-val" style="font-size:11px;color:var(--text2);word-break:break-word;white-space:pre-wrap;">${escH(idea.nano_prompt_with_text || idea.nano_prompt || '')}</div>
+        </div>
+
+        ${idea.kling_prompt ? `<div class="s-row">
+          <div class="s-label" style="color:var(--teal)">KLING3 — Animation prompt</div>
+          <div class="s-val">${escH(idea.kling_prompt)}</div>
+          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.kling_prompt)}')">Copy</button>
+        </div>` : ''}
+
+      </div>`;
+    container.appendChild(card);
+  });
 }
 
 // ── SAME PLACE NEW POSES ─────────────────────────────────
