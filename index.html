@@ -274,6 +274,38 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="cards" id="extract-results"></div>
     <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
     <div class="hist-list" id="extract-hist"></div>
+
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+      <div class="p-title" style="font-size:20px;margin-bottom:4px;">Same Place, New Poses</div>
+      <div class="p-desc">Upload an existing image of Mika — get 3 more pose variants in the exact same location and setting.</div>
+
+      <div class="upload-box" id="poses-upload-box">
+        <p>Upload an existing Mika image</p>
+        <div class="file-input-wrap">
+          <input type="file" id="poses-file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="onPosesFile(event)">
+        </div>
+        <small>JPG · PNG · WEBP · max 5MB</small>
+      </div>
+
+      <div id="poses-preview" style="display:none">
+        <img id="poses-preview-img" class="preview-img">
+        <div class="preview-row">
+          <span class="preview-name" id="poses-preview-name"></span>
+          <button class="btn-ghost" style="padding:5px 11px;font-size:11px" onclick="clearPoses()">✕ Remove</button>
+        </div>
+      </div>
+
+      <div class="lbl" style="margin-top:4px;">Hair <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(keep same or change)</span></div>
+      <div class="chips" id="poses-hair"></div>
+
+      <div class="row">
+        <button class="btn-teal" id="poses-btn" onclick="runPoses()" disabled><span>🔄</span> Generate 3 New Poses</button>
+        <button class="btn-ghost" onclick="clearPoses()">Clear</button>
+      </div>
+      <div class="loading" id="poses-load"><div class="spin"></div><span>Analyzing location and generating poses...</span></div>
+      <div class="cards" id="poses-results"></div>
+    </div>
+
   </div>
 
   <!-- ── HASBARA / IMAGE STUDIO PANEL ── -->
@@ -325,7 +357,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="divider"></div>
     <div><div class="lbl">Bedroom</div><textarea class="field" id="m-bed" rows="3">Modern warm Tel Aviv apartment bedroom. White walls, light oak wood bed frame with rumpled white linen, warm pendant light on nightstand, sheer curtains letting in morning light. Slightly lived-in — maybe a jacket on the chair, phone charger on the floor.</textarea></div>
     <div><div class="lbl">Kitchen</div><textarea class="field" id="m-kit" rows="3">Open plan Israeli apartment kitchen. White cabinets, light wood countertop, subway tile backsplash, small espresso machine on counter, morning light from window. A few dishes in the sink, paper towel half-used — authentic not staged.</textarea></div>
-    <div><div class="lbl">Living Room</div><textarea class="field" id="m-sal" rows="3">Minimalist warm living room. Light beige linen couch, low oak coffee table with a book on it, large window with natural light, cream walls, a plant in corner. Cozy but slightly casual.</textarea></div>
+    <div><div class="lbl">Living Room</div><textarea class="field" id="m-sal" rows="3">Mika's apartment living room. Modern warm Israeli apartment. Cozy beige fabric sofa, flat screen TV mounted on the wall, low oak coffee table, warm ambient lighting, cream walls, indoor plant in the corner, soft rug on the floor. Comfortable and lived-in — NOT a hair salon.</textarea></div>
     <div><div class="lbl">Bathroom</div><textarea class="field" id="m-bath" rows="3">Small modern Israeli apartment bathroom. White tiles, frameless mirror, skincare products on counter in a small disorganized cluster, warm vanity light, slightly steamy morning feel.</textarea></div>
     <div class="divider"></div>
     <div>
@@ -350,6 +382,9 @@ let dailyOutfit = 'auto';
 let dailyKling = '5s';
 let extractHair = 'default';
 let extractOutfit = 'auto';
+let posesImgB64 = null;
+let posesImgType = 'image/jpeg';
+let posesHair = 'default';
 let hasbaraMood = 'thinking';
 let hasbaraSetting = 'neutral';
 let hasbaraHair = 'default';
@@ -512,6 +547,7 @@ function buildChips() {
   mkChips('daily-kling',  KLING_OPTS,      '5s',      'on-teal',  v => dailyKling = v);
   mkChips('extract-hair',   HAIR_OPTS,         'default', 'on-teal',  v => extractHair = v);
   mkChips('extract-outfit', EXTRACT_OUTFIT_OPTS,'auto',    'on-teal',  v => extractOutfit = v);
+  mkChips('poses-hair', HAIR_OPTS, 'default', 'on-teal', v => posesHair = v);
   mkChips('has-mood',    MOOD_OPTS,    'thinking','on-coral', v => hasbaraMood = v);
   mkChips('has-setting', SETTING_OPTS,'neutral', 'on-coral', v => hasbaraSetting = v);
   mkChips('has-hair',    HAIR_OPTS,   'default', 'on-coral', v => hasbaraHair = v);
@@ -701,7 +737,7 @@ ${moodLine}
 ${AUTHENTICITY}
 Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
 Return JSON only:
-{"scene_summary":"one line","main_prompt":"full prompt","variants":[{"pose_note":"brief","prompt":"full prompt"},{"pose_note":"brief","prompt":"full prompt"},{"pose_note":"brief","prompt":"full prompt"}],"kling_main":"${klingLine}","caption_idea":"casual English caption"}`;
+{"scene_summary":"one line","main_prompt":"full prompt","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
 
   try {
     const raw = await api(system, `Generate lifestyle prompts for Mika in scene: ${scene}`, false);
@@ -726,7 +762,8 @@ function renderDailyData(container, data) {
   ], 0));
   (data.variants || []).forEach((v, i) => {
     container.appendChild(makeCard('badge', 'VARIANT ' + (i+1), v.pose_note || '', [
-      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt }
+      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt },
+      { label:'KLING3 — Variant ' + (i+1), cls:'g', text: v.kling }
     ], (i+1) * 0.09));
   });
 }
@@ -781,7 +818,7 @@ Home room library (use EXACTLY when scene matches — do NOT copy background fro
 - Bathroom: ${homeRooms.bathroom}
 RULES: 1) Analyze image for pose, expression, outfit, setting, lighting, angle, mood. 2) For background: if bedroom/kitchen/living room/bathroom → use saved description exactly. Otherwise describe faithfully from the photo. 3) Replace the person entirely with Mika — same pose, same energy, same scene. 4) ${AUTHENTICITY} 5) Generate 1 main + 3 pose variants in same location.
 Return JSON only:
-{"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","variants":[{"pose_note":"brief","prompt":"full"},{"pose_note":"brief","prompt":"full"},{"pose_note":"brief","prompt":"full"}],"kling_main":"KLING3 2-3 sec subtle animation","caption_idea":"casual caption"}`;
+{"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","kling_main":"KLING3 animation for main shot","variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual caption"}`;
 
   try {
     const raw = await apiWithImage(system, 'Analyze this image and generate the full prompt set for Mika.', imgB64, imgType);
@@ -811,7 +848,8 @@ function renderExtractData(container, data) {
   ], 0.08));
   (data.variants || []).forEach((v, i) => {
     container.appendChild(makeCard('badge', 'VARIANT ' + (i+1), v.pose_note || '', [
-      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt }
+      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt },
+      { label:'KLING3 — Variant ' + (i+1), cls:'g', text: v.kling }
     ], (i+2) * 0.09));
   });
 }
@@ -944,6 +982,98 @@ function saveSettings() {
 // ── UTIL ─────────────────────────────────────────────────
 function errCard(msg) {
   return `<div style="padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);color:var(--text2);font-size:12px;line-height:1.7">${escH(msg)}</div>`;
+}
+
+// ── SAME PLACE NEW POSES ─────────────────────────────────
+function onPosesFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
+  posesImgType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    posesImgB64 = ev.target.result.split(',')[1];
+    document.getElementById('poses-preview-img').src = ev.target.result;
+    document.getElementById('poses-preview-name').textContent = file.name + ' · ' + (file.size/1024).toFixed(0) + ' KB';
+    document.getElementById('poses-preview').style.display = 'block';
+    document.getElementById('poses-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPoses() {
+  posesImgB64 = null;
+  document.getElementById('poses-preview').style.display = 'none';
+  document.getElementById('poses-btn').disabled = true;
+  try { document.getElementById('poses-file').value = ''; } catch {}
+  document.getElementById('poses-results').innerHTML = '';
+}
+
+async function runPoses() {
+  if (!KEY || !posesImgB64) return;
+  const btn = document.getElementById('poses-btn');
+  const load = document.getElementById('poses-load');
+  const res = document.getElementById('poses-results');
+  btn.disabled = true; load.classList.add('show');
+
+  const char = getChar();
+  const hairLine = HAIR_DESC[posesHair] || HAIR_DESC['default'];
+  const homeRooms = {
+    bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'),
+    salon: getRoom('salon'), bathroom: getRoom('bathroom')
+  };
+
+  const system = `You are a creative director generating Nano Banana image prompt variants for an AI character named Mika.
+You will receive an existing image. Your job is to:
+1. Carefully analyze the BACKGROUND and SETTING — describe it in precise detail (every furniture piece, colors, lighting, angle, time of day).
+2. Identify if the background matches one of Mika's saved home rooms — if so, use that saved description exactly. If not, describe it faithfully from the photo.
+3. Keep the EXACT SAME background/location/lighting in all 3 variants. Only Mika's pose, expression, and body language should change.
+4. Replace the person in the image entirely with Mika's description.
+
+Mika's appearance: ${char}
+Hair: ${hairLine}
+${NECKLACE}
+${AUTHENTICITY}
+
+Saved home rooms (use EXACTLY if scene matches):
+- Bedroom: ${homeRooms.bedroom}
+- Kitchen: ${homeRooms.kitchen}
+- Living room: ${homeRooms.salon}
+- Bathroom: ${homeRooms.bathroom}
+
+Return JSON only:
+{
+  "location_detected": "one line description of the detected location",
+  "background_locked": "full detailed background description that will be copy-pasted into all 3 prompts",
+  "variants": [
+    {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt with Mika appearance + hair + necklace + this pose + background_locked + authenticity", "kling": "KLING3 animation prompt for this pose"},
+    {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt", "kling": "KLING3 animation prompt for this pose"},
+    {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt", "kling": "KLING3 animation prompt for this pose"}
+  ]
+}`;
+
+  try {
+    const raw = await apiWithImage(system, 'Analyze this image and generate 3 new pose variants for Mika in the exact same location.', posesImgB64, posesImgType);
+    const data = parseJSON(raw, false);
+    res.innerHTML = '';
+
+    // Info card
+    res.appendChild(makeCard('badge-gold', 'LOCATION LOCKED', data.location_detected || '', [
+      { label: 'Background used in all 3 prompts', cls: 'g', text: data.background_locked }
+    ], 0));
+
+    // 3 variant cards
+    (data.variants || []).forEach((v, i) => {
+      res.appendChild(makeCard('badge-teal', 'POSE ' + (i+1), v.pose_note || '', [
+        { label: 'Nano Banana — Pose ' + (i+1), cls: 't', text: v.prompt },
+        { label: 'KLING3 — Pose ' + (i+1), cls: 'g', text: v.kling }
+      ], (i+1) * 0.09));
+    });
+
+  } catch(e) {
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
 }
 
 renderAllHist();
