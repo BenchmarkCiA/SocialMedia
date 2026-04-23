@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mika Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:#0f0e0d; --bg2:#181714; --bg3:#211f1c;
+  --surface:#2a2824; --surface2:#343028;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#f0ece6; --text2:#9e9a94; --text3:#5e5a56;
+  --coral:#e8694a; --coral2:#c4532e;
+  --teal:#4ab8a0; --teal2:#2e8f7a;
+  --gold:#d4a847; --gold2:#a07d2a;
+  --r:12px; --rl:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* SETUP */
+#setup{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+.logo{font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-1px;background:linear-gradient(135deg,var(--text),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{color:var(--text2);font-size:13px;font-weight:300;margin:6px 0 40px;letter-spacing:.5px;}
+.setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:28px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:18px;}
+.lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
+input.field,textarea.field{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+input.field:focus,textarea.field:focus{border-color:var(--border2);}
+input.field::placeholder,textarea.field::placeholder{color:var(--text3);}
+textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
+.btn-gold{background:var(--gold);color:#0f0e0d;border:none;border-radius:var(--r);padding:13px 22px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;width:100%;}
+.btn-gold:hover{background:var(--gold2);}
+.btn-gold:active{transform:scale(.98);}
+
+/* APP */
+#app{display:none;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(15,14,13,.96);backdrop-filter:blur(12px);z-index:100;}
+.topbar-logo{font-family:'DM Serif Display',serif;font-size:20px;background:linear-gradient(135deg,var(--text),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.gear-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 11px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;}
+.gear-btn:hover{border-color:var(--border2);color:var(--text);}
+
+/* TABS */
+.tabs{display:flex;padding:16px 20px 0;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0;user-select:none;}
+.tab:hover{color:var(--text);}
+.tab.t-daily{color:var(--teal);border-bottom-color:var(--teal);}
+.tab.t-extract{color:var(--gold);border-bottom-color:var(--gold);}
+.tab.t-hasbara{color:var(--coral);border-bottom-color:var(--coral);}
+
+/* PANELS */
+.panel{display:none;padding:24px 20px;max-width:780px;margin:0 auto;}
+.panel.active{display:block;}
+.p-title{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:5px;}
+.p-desc{color:var(--text2);font-size:12px;font-weight:300;line-height:1.6;margin-bottom:22px;}
+
+/* SELECTORS */
+.sel-label{font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.chip{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;user-select:none;font-family:'DM Sans',sans-serif;}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.chip.on-coral{border-color:var(--coral);color:var(--coral);background:rgba(232,105,74,.08);}
+.chip.on-teal{border-color:var(--teal);color:var(--teal);background:rgba(74,184,160,.08);}
+.chip.on-gold{border-color:var(--gold);color:var(--gold);background:rgba(212,168,71,.08);}
+
+/* SCENE GRID */
+.scenes{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:7px;margin-bottom:18px;}
+.scene{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 8px;cursor:pointer;transition:all .2s;text-align:center;user-select:none;}
+.scene:hover{border-color:var(--border2);}
+.scene.on{border-color:var(--teal);background:rgba(74,184,160,.08);}
+.scene-icon{font-size:20px;margin-bottom:4px;display:block;}
+.scene-name{font-size:11px;color:var(--text2);font-weight:500;}
+.scene.on .scene-name{color:var(--teal);}
+
+/* BUTTONS */
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px;}
+.btn-coral{background:var(--coral);color:#fff;border:none;border-radius:var(--r);padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.btn-coral:hover{background:var(--coral2);}
+.btn-coral:disabled{opacity:.45;cursor:not-allowed;}
+.btn-teal{background:var(--teal);color:#0f0e0d;border:none;border-radius:var(--r);padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.btn-teal:hover{background:var(--teal2);color:#fff;}
+.btn-teal:disabled{opacity:.45;cursor:not-allowed;}
+.btn-ghost{background:none;border:1px solid var(--border);border-radius:var(--r);padding:11px 16px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);}
+
+/* LOADING */
+.loading{display:none;align-items:center;gap:11px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:18px;color:var(--text2);font-size:12px;}
+.loading.show{display:flex;}
+.spin{width:15px;height:15px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* CARDS */
+.cards{display:flex;flex-direction:column;gap:14px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;animation:fadeUp .35s ease forwards;opacity:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;}
+.badge{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 7px;border-radius:4px;background:var(--surface);color:var(--text3);flex-shrink:0;}
+.badge-coral{background:rgba(232,105,74,.15);color:var(--coral);}
+.badge-teal{background:rgba(74,184,160,.15);color:var(--teal);}
+.badge-gold{background:rgba(212,168,71,.15);color:var(--gold);}
+.card-topic{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;}
+.card-body{padding:16px;display:flex;flex-direction:column;gap:13px;}
+.sec-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
+.sec-label.c{color:var(--coral);opacity:.85;}
+.sec-label.t{color:var(--teal);opacity:.85;}
+.sec-label.g{color:var(--gold);opacity:.85;}
+.prompt-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:12px;line-height:1.65;color:var(--text);font-weight:300;white-space:pre-wrap;word-break:break-word;}
+.copy-btn{align-self:flex-end;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 11px;color:var(--text3);font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;margin-top:-4px;}
+.copy-btn:hover{border-color:var(--border2);color:var(--text2);}
+.copy-btn.done{color:var(--teal);border-color:var(--teal);}
+
+/* UPLOAD */
+.upload-box{border:1.5px dashed var(--border2);border-radius:var(--rl);padding:28px 20px;text-align:center;margin-bottom:16px;}
+.upload-box p{color:var(--text2);font-size:13px;margin-bottom:14px;}
+.upload-box small{color:var(--text3);font-size:11px;display:block;margin-top:10px;}
+.file-input-wrap{display:inline-block;}
+.file-input-wrap input[type=file]{font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;width:100%;}
+.file-input-wrap input[type=file]::file-selector-button{background:var(--gold);color:#0f0e0d;border:none;border-radius:8px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-right:12px;}
+.preview-img{max-width:100%;max-height:260px;border-radius:var(--r);border:1px solid var(--border);object-fit:contain;display:block;margin-bottom:10px;}
+.preview-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.preview-name{font-size:11px;color:var(--text3);flex:1;}
+
+/* HISTORY */
+.hist-head{display:flex;align-items:center;justify-content:space-between;margin:28px 0 10px;}
+.hist-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.hist-clear{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.hist-clear:hover{color:var(--coral);}
+.hist-list{display:flex;flex-direction:column;gap:5px;}
+.hist-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;}
+.hist-item:hover{border-color:var(--border2);color:var(--text);}
+.hist-date{font-size:10px;color:var(--text3);margin-bottom:2px;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.hist-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-load{font-size:10px;flex-shrink:0;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:28px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;gap:18px;}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;}
+.divider{height:1px;background:var(--border);margin:2px 0;}
+.radio-row{display:flex;gap:14px;flex-wrap:wrap;}
+.radio-row label{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;z-index:9999;border:1px solid var(--border2);white-space:nowrap;pointer-events:none;}
+
+/* MOBILE */
+@media(max-width:600px){
+  .panel{padding:16px 12px;}
+  .topbar{padding:11px 14px;}
+  .tabs{padding:12px 12px 0;}
+  .tab{padding:9px 12px;font-size:12px;}
+  .p-title{font-size:21px;}
+  .scenes{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));}
+  .card-body{padding:13px;}
+  .prompt-box{font-size:11px;}
+  .modal{padding:20px 16px;}
+  .setup-card{padding:22px 16px;}
+  .logo{font-size:34px;}
+}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup">
+  <div class="logo">Mika Studio</div>
+  <div class="sub">Content Studio · Powered by Claude</div>
+  <div class="setup-card">
+    <div>
+      <div class="lbl">Anthropic API Key</div>
+      <input class="field" type="password" id="s-key" placeholder="sk-ant-...">
+    </div>
+    <button class="btn-gold" onclick="boot()">Enter Studio →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="topbar">
+    <div class="topbar-logo">Mika Studio</div>
+    <button class="gear-btn" onclick="openModal()">⚙ Settings</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab t-daily" id="tab-daily" onclick="go('daily')">✦ Daily Profile</div>
+    <div class="tab" id="tab-extract" onclick="go('extract')">🖼 Prompt Extractor</div>
+    <div class="tab" id="tab-hasbara" onclick="go('hasbara')">🔴 Image Studio</div>
+  </div>
+
+  <!-- ── DAILY PANEL ── -->
+  <div class="panel active" id="panel-daily">
+    <div class="p-title">Daily Profile</div>
+    <div class="p-desc">Generate authentic Nano Banana + KLING3 prompts for Mika's lifestyle content — consistent home environments, 1 hero shot + 3 variants.</div>
+
+    <div class="lbl">Scene</div>
+    <div class="scenes" id="daily-scenes">
+      <div class="scene on" data-s="bedroom" onclick="pickScene(this)"><span class="scene-icon">🛏</span><span class="scene-name">Bedroom</span></div>
+      <div class="scene" data-s="kitchen" onclick="pickScene(this)"><span class="scene-icon">🍳</span><span class="scene-name">Kitchen</span></div>
+      <div class="scene" data-s="salon" onclick="pickScene(this)"><span class="scene-icon">🛋</span><span class="scene-name">Living Room</span></div>
+      <div class="scene" data-s="bathroom" onclick="pickScene(this)"><span class="scene-icon">🚿</span><span class="scene-name">Bathroom</span></div>
+      <div class="scene" data-s="israel-street" onclick="pickScene(this)"><span class="scene-icon">🌴</span><span class="scene-name">Israel Street</span></div>
+      <div class="scene" data-s="cafe" onclick="pickScene(this)"><span class="scene-icon">☕</span><span class="scene-name">Café</span></div>
+      <div class="scene" data-s="beach" onclick="pickScene(this)"><span class="scene-icon">🏖</span><span class="scene-name">Beach</span></div>
+      <div class="scene" data-s="gym" onclick="pickScene(this)"><span class="scene-icon">💪</span><span class="scene-name">Gym</span></div>
+      <div class="scene" data-s="market" onclick="pickScene(this)"><span class="scene-icon">🧺</span><span class="scene-name">Shuk</span></div>
+      <div class="scene" data-s="outdoor" onclick="pickScene(this)"><span class="scene-icon">🌿</span><span class="scene-name">Outdoor</span></div>
+    </div>
+
+    <div class="lbl">Mood <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></div>
+    <div class="chips" id="daily-mood"></div>
+
+    <div class="lbl">Hair</div>
+    <div class="chips" id="daily-hair"></div>
+    <div class="lbl">Outfit</div>
+    <div class="chips" id="daily-outfit"></div>
+
+    <div class="lbl">KLING3 Duration</div>
+    <div class="chips" id="daily-kling"></div>
+
+    <div id="outdoor-note-wrap" style="display:none;margin-bottom:18px;">
+      <div class="lbl">Describe the outdoor location <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — leave blank for default)</span></div>
+      <input class="field" type="text" id="outdoor-note" placeholder="e.g. hiking in the Galil, walking near Jaffa port, rooftop in Tel Aviv...">
+    </div>
+
+    <div class="row">
+      <button class="btn-teal" id="daily-btn" onclick="runDaily()"><span>✦</span> Generate Prompts</button>
+      <button class="btn-ghost" onclick="clearR('daily')">Clear</button>
+    </div>
+    <div class="loading" id="daily-load"><div class="spin"></div><span id="daily-load-txt">Building prompts for Mika...</span></div>
+    <div class="cards" id="daily-results"></div>
+    <div class="hist-head"><span class="hist-title">Saved prompts</span><button class="hist-clear" onclick="clearHist('daily')">Clear all</button></div>
+    <div class="hist-list" id="daily-hist"></div>
+  </div>
+
+  <!-- ── EXTRACT PANEL ── -->
+  <div class="panel" id="panel-extract">
+    <div class="p-title">Prompt Extractor</div>
+    <div class="p-desc">Upload any image — extract pose &amp; scene, replace with Mika using your saved room library, get 1 hero + 3 variants + KLING3.</div>
+
+    <div class="upload-box" id="upload-box">
+      <p>Upload a reference image</p>
+      <div class="file-input-wrap">
+        <input type="file" id="img-file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="onFile(event)">
+      </div>
+      <small>JPG · PNG · WEBP · max 5MB</small>
+    </div>
+
+    <div id="img-preview" style="display:none">
+      <img id="preview-img" class="preview-img">
+      <div class="preview-row">
+        <span class="preview-name" id="preview-name"></span>
+        <button class="btn-ghost" style="padding:5px 11px;font-size:11px" onclick="clearImg()">✕ Remove</button>
+      </div>
+    </div>
+
+    <div class="lbl">Hair</div>
+    <div class="chips" id="extract-hair"></div>
+    <div class="lbl">Outfit <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — auto from image)</span></div>
+    <div class="chips" id="extract-outfit"></div>
+
+    <div class="row">
+      <button class="btn-teal" id="extract-btn" onclick="runExtract()" disabled><span>🔍</span> Extract &amp; Generate</button>
+      <button class="btn-ghost" onclick="clearImg()">Clear</button>
+    </div>
+    <div class="loading" id="extract-load"><div class="spin"></div><span id="extract-load-txt">Analyzing image...</span></div>
+    <div class="cards" id="extract-results"></div>
+    <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
+    <div class="hist-list" id="extract-hist"></div>
+  </div>
+
+  <!-- ── HASBARA / IMAGE STUDIO PANEL ── -->
+  <div class="panel" id="panel-hasbara">
+    <div class="p-title">Image Studio</div>
+    <div class="p-desc">Generate Mika visuals for your advocacy account — pick mood, setting, hair, outfit, add an optional topic and get full Nano Banana + KLING3 prompts and captions.</div>
+
+    <div class="lbl">Mood</div>
+    <div class="chips" id="has-mood"></div>
+    <div class="lbl">Setting</div>
+    <div class="chips" id="has-setting"></div>
+    <div class="lbl">Hair</div>
+    <div class="chips" id="has-hair"></div>
+    <div class="lbl">Outfit</div>
+    <div class="chips" id="has-outfit"></div>
+    <div class="lbl">Caption tone</div>
+    <div class="chips" id="has-tone"></div>
+
+    <div style="margin-bottom:18px">
+      <div class="lbl">Topic / Message <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></div>
+      <textarea class="field" id="has-topic" rows="3" placeholder="Leave blank to generate based on mood + setting alone.&#10;Or describe a topic, reaction, or message you want Mika to convey."></textarea>
+    </div>
+
+    <div class="row">
+      <button class="btn-coral" id="has-btn" onclick="runHasbara()"><span>✦</span> Generate Prompts</button>
+      <button class="btn-ghost" onclick="clearR('hasbara')">Clear</button>
+    </div>
+    <div class="loading" id="has-load"><div class="spin"></div><span>Generating Mika visuals...</span></div>
+    <div class="cards" id="has-results"></div>
+    <div class="hist-head"><span class="hist-title">Previous generations</span><button class="hist-clear" onclick="clearHist('hasbara')">Clear all</button></div>
+    <div class="hist-list" id="has-hist"></div>
+  </div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Settings</div>
+    <div>
+      <div class="lbl">API Key</div>
+      <input class="field" type="password" id="m-key" placeholder="sk-ant-...">
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="lbl">Character description</div>
+      <textarea class="field" id="m-char" rows="4">A 175cm tall young woman in her mid-20s with long straight blonde hair with lighter highlights, blue-green eyes, light skin with very subtle freckles scattered across the nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli.</textarea>
+    </div>
+    <div class="divider"></div>
+    <div><div class="lbl">Bedroom</div><textarea class="field" id="m-bed" rows="3">Modern warm Tel Aviv apartment bedroom. White walls, light oak wood bed frame with rumpled white linen, warm pendant light on nightstand, sheer curtains letting in morning light. Slightly lived-in — maybe a jacket on the chair, phone charger on the floor.</textarea></div>
+    <div><div class="lbl">Kitchen</div><textarea class="field" id="m-kit" rows="3">Open plan Israeli apartment kitchen. White cabinets, light wood countertop, subway tile backsplash, small espresso machine on counter, morning light from window. A few dishes in the sink, paper towel half-used — authentic not staged.</textarea></div>
+    <div><div class="lbl">Living Room</div><textarea class="field" id="m-sal" rows="3">Minimalist warm living room. Light beige linen couch, low oak coffee table with a book on it, large window with natural light, cream walls, a plant in corner. Cozy but slightly casual.</textarea></div>
+    <div><div class="lbl">Bathroom</div><textarea class="field" id="m-bath" rows="3">Small modern Israeli apartment bathroom. White tiles, frameless mirror, skincare products on counter in a small disorganized cluster, warm vanity light, slightly steamy morning feel.</textarea></div>
+    <div class="divider"></div>
+    <div>
+      <div class="lbl">Caption language</div>
+      <div class="radio-row">
+        <label><input type="radio" name="lang" value="english" checked> English</label>
+        <label><input type="radio" name="lang" value="hebrew"> Hebrew</label>
+        <label><input type="radio" name="lang" value="both"> Both</label>
+      </div>
+    </div>
+    <button class="btn-gold" onclick="saveSettings()">Save Settings</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────
+let KEY = '';
+let dailyScene = 'bedroom';
+let dailyMood = 'none';
+let dailyHair = 'default';
+let dailyOutfit = 'auto';
+let dailyKling = '5s';
+let extractHair = 'default';
+let extractOutfit = 'auto';
+let hasbaraMood = 'thinking';
+let hasbaraSetting = 'neutral';
+let hasbaraHair = 'default';
+let hasbaraOutfit = 'auto';
+let hasbaraTone = 'cynical';
+let imgB64 = null;
+let imgType = 'image/jpeg';
+
+let histDaily   = JSON.parse(localStorage.getItem('ms_hist_daily')   || '[]');
+let histExtract = JSON.parse(localStorage.getItem('ms_hist_extract') || '[]');
+let histHasbara = JSON.parse(localStorage.getItem('ms_hist_hasbara') || '[]');
+
+// ── CHIP DATA ────────────────────────────────────────────
+const DAILY_MOOD_OPTS = [
+  {v:'none',l:'✦ No mood / natural'},
+  {v:'thinking',l:'🤔 Thinking'},{v:'serious',l:'😐 Serious'},{v:'proud',l:'💪 Proud'},
+  {v:'sarcastic',l:'🙄 Sarcastic'},{v:'shocked',l:'😳 Shocked'},{v:'smiling',l:'😊 Warm Smile'},
+  {v:'assertive',l:'✊ Assertive'},{v:'happy',l:'😄 Happy/Laughing'},{v:'relaxed',l:'😌 Relaxed'}
+];
+const KLING_OPTS = [
+  {v:'3s',l:'3 sec — Subtle'},
+  {v:'5s',l:'5 sec — Natural'},
+  {v:'10s',l:'10 sec — Extended'}
+];
+const HAIR_OPTS = [
+  {v:'default',l:'✦ As usual'},{v:'middle-part',l:'〰 Middle part'},{v:'side-part',l:'↗ Side part'},
+  {v:'ponytail',l:'🎀 Ponytail'},{v:'high-bun',l:'🌀 High bun'},{v:'messy-bun',l:'💫 Messy bun'},
+  {v:'half-up',l:'〽 Half up'},{v:'wavy',l:'〜 Wavy'},{v:'straight-sleek',l:'▬ Sleek straight'},
+  {v:'braided',l:'⟁ Braided'},{v:'surprise',l:'🎲 Surprise me'}
+];
+const OUTFIT_OPTS = [
+  {v:'auto',l:'✦ Auto'},{v:'casual',l:'👕 Casual'},{v:'elegant',l:'✨ Elegant'},{v:'sporty',l:'🏃 Sporty'},
+  {v:'dress-mini',l:'👗 Mini Dress'},{v:'dress-midi',l:'👗 Midi Dress'},{v:'dress-maxi',l:'👗 Maxi Dress'},
+  {v:'tight',l:'🔥 Fitted'},{v:'loose',l:'🌿 Loose/Flowy'},{v:'bodysuit',l:'⬛ Bodysuit'},
+  {v:'swimwear',l:'🌊 Swimwear'},{v:'lingerie-style',l:'🌸 Bralette Set'}
+];
+const EXTRACT_OUTFIT_OPTS = [{v:'auto',l:'✦ From image'}].concat(OUTFIT_OPTS.slice(1));
+const MOOD_OPTS = [
+  {v:'thinking',l:'🤔 Thinking'},{v:'serious',l:'😐 Serious'},{v:'proud',l:'💪 Proud'},
+  {v:'sarcastic',l:'🙄 Sarcastic'},{v:'shocked',l:'😳 Shocked'},{v:'smiling',l:'😊 Warm Smile'},
+  {v:'assertive',l:'✊ Assertive'},{v:'disappointed',l:'😔 Disappointed'}
+];
+const SETTING_OPTS = [
+  {v:'neutral',l:'🎞 Neutral'},{v:'israel-street',l:'🌴 Israel Street'},{v:'beach',l:'🏖 Beach'},
+  {v:'cafe',l:'☕ Café'},{v:'rooftop',l:'🌆 Rooftop'},{v:'market',l:'🧺 Shuk'}
+];
+const TONE_OPTS = [
+  {v:'cynical',l:'Cynical/Sharp'},{v:'humor',l:'Dark Humor'},{v:'factual',l:'Fact-Based'},{v:'proud',l:'Proud/Strong'}
+];
+
+// ── DESCRIPTIONS ─────────────────────────────────────────
+const HAIR_DESC = {
+  'default':'her usual long straight blonde hair worn naturally down',
+  'middle-part':'long straight blonde hair with a clean middle part, falling naturally on both sides',
+  'side-part':'long straight blonde hair with a side part swept gently to one side',
+  'ponytail':'hair pulled back into a neat ponytail, showing her face and neck clearly',
+  'high-bun':'hair up in a high bun, a few small strands loose around the face',
+  'messy-bun':'casual messy bun, relaxed and effortless with loose strands framing her face',
+  'half-up':'half-up half-down — top section pulled back, rest of the hair falling loose',
+  'wavy':'soft natural waves, slightly tousled beach-wave texture',
+  'straight-sleek':'hair blown out perfectly straight and sleek',
+  'braided':'a simple loose braid or side braid, casual and feminine',
+  'surprise':'a creative or unexpected hairstyle that fits the mood and setting'
+};
+const OUTFIT_DESC = {
+  'auto':null,
+  'casual':'casual everyday outfit — jeans or simple trousers, basic tee or tank top, relaxed style',
+  'elegant':'elegant outfit — tailored blazer, sleek trousers or a sophisticated blouse, polished look',
+  'sporty':'sporty athletic wear — leggings or shorts with a fitted sports top or hoodie',
+  'dress-mini':'short mini dress, above the knee, fitted or flowy',
+  'dress-midi':'midi dress reaching mid-calf, feminine and stylish',
+  'dress-maxi':'flowy maxi dress reaching the floor, elegant and relaxed',
+  'tight':'form-fitting outfit — fitted top and tight jeans or leggings that show her figure',
+  'loose':'loose flowy clothing — oversized shirt or flowy blouse with relaxed trousers',
+  'bodysuit':'sleek bodysuit tucked into high-waisted pants or skirt',
+  'swimwear':'swimwear — stylish one-piece or bikini appropriate for beach or pool setting',
+  'lingerie-style':'delicate bralette and matching high-waisted shorts or skirt, soft feminine aesthetic'
+};
+const DAILY_MOOD_DESC = {
+  'none': null,
+  'thinking':'thoughtful expression, finger lightly touching chin or temple, subtle knowing look',
+  'serious':'direct serious gaze, composed and calm, strong confident posture',
+  'proud':'chin slightly raised, soft proud smile, radiates quiet confidence',
+  'sarcastic':'one eyebrow slightly raised, subtle smirk, amused disbelief',
+  'shocked':'eyes slightly widened, mouth barely open, genuine surprised expression',
+  'smiling':'warm genuine smile reaching the eyes, relaxed open expression',
+  'assertive':'direct eye contact, firm jaw, powerful stance',
+  'happy':'laughing or wide genuine smile, bright energy, joyful expression',
+  'relaxed':'soft relaxed expression, eyes slightly soft, calm peaceful vibe'
+};
+const MOOD_DESC = {
+  'thinking':'thoughtful expression, finger lightly touching chin or temple, eyes slightly upward as if processing, subtle knowing look',
+  'serious':'direct serious gaze into camera, lips slightly pressed, composed and calm, strong confident posture',
+  'proud':'chin slightly raised, soft proud smile, open chest, relaxed shoulders back, radiates quiet confidence',
+  'sarcastic':'one eyebrow slightly raised, subtle smirk at corner of lips, head tilted very slightly, amused disbelief',
+  'shocked':'eyes slightly widened, mouth barely open, hand near collarbone, genuine surprised expression',
+  'smiling':'warm genuine smile reaching the eyes, relaxed open expression, approachable and friendly energy',
+  'assertive':'direct eye contact, firm jaw, slight forward lean, arms possibly crossed or hands on hips, powerful stance',
+  'disappointed':'subtle head shake implied, downward gaze with slight frown, resigned but composed expression'
+};
+const SETTING_DESC = {
+  'neutral':'clean simple background, soft even lighting, focus entirely on Mika, minimal backdrop — plain light wall or very blurred neutral environment',
+  'israel-street':'Tel Aviv street background, warm Israeli city, Bauhaus architecture, Hebrew street signs visible and blurred in background, warm Mediterranean afternoon light',
+  'beach':'Tel Aviv beach background, Mediterranean sea and sky, warm golden hour light, slightly blurred background',
+  'cafe':'Israeli café background, warm wood interior, blurred patrons and espresso machine, ambient warm light',
+  'rooftop':'Tel Aviv rooftop at dusk or golden hour, city skyline blurred behind her, warm ambient light',
+  'market':'Mahane Yehuda or Carmel market background, colorful stalls and Hebrew signs blurred behind her, warm afternoon light'
+};
+const TONE_DESC = {
+  'cynical':'cynical, dry, and sharp — maximum wit with minimum words. Think intellectual sarcasm.',
+  'humor':'darkly humorous — expose the absurdity with a joke that lands hard.',
+  'factual':'direct and fact-based — concise truth that shuts down the claim.',
+  'proud':'proud and strong — confident Israeli voice, no apologies.'
+};
+const KLING_DESC = {
+  '3s': '3-second clip — one single subtle movement only: a gentle head tilt, slow blink, or slight hair movement. Keep it minimal.',
+  '5s': '5-second clip — gentle continuous natural movement: soft breathing, subtle hair sway, a slow smile or glance. Calm and human.',
+  '10s': '10-second clip — extended natural scene: begins with a relaxed pose, transitions through a gentle expression change or movement, ends naturally. Varied but understated.'
+};
+const NECKLACE = 'She is always wearing a delicate gold necklace with a small Magen David (Star of David) pendant — must be clearly visible in the image.';
+const AUTHENTICITY = 'AUTHENTICITY: The image must look like a real iPhone photo — natural uneven lighting, slightly imperfect angle, NOT a studio shoot. Lived-in feel, not perfect composition.';
+
+// ── INIT ────────────────────────────────────────────────
+function boot() {
+  const k = document.getElementById('s-key').value.trim();
+  if (!k.startsWith('sk-')) { alert('Enter a valid Anthropic API key (starts with sk-ant-)'); return; }
+  KEY = k;
+  localStorage.setItem('ms_key', k);
+  showApp();
+}
+
+window.addEventListener('load', () => {
+  const k = localStorage.getItem('ms_key');
+  if (k) { KEY = k; showApp(); }
+  loadSettings();
+  buildChips();
+  renderAllHist();
+});
+
+function showApp() {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('m-key').value = KEY;
+}
+
+function loadSettings() {
+  const fs = ['m-char','m-bed','m-kit','m-sal','m-bath'];
+  const ks = ['ms_char','ms_bed','ms_kit','ms_sal','ms_bath'];
+  fs.forEach((f,i) => { const v = localStorage.getItem(ks[i]); if (v) document.getElementById(f).value = v; });
+  const lang = localStorage.getItem('ms_lang') || 'english';
+  const r = document.querySelector(`input[name=lang][value="${lang}"]`);
+  if (r) r.checked = true;
+}
+
+// ── BUILD CHIPS ──────────────────────────────────────────
+function buildChips() {
+  mkChips('daily-mood',   DAILY_MOOD_OPTS, 'none',    'on-teal',  v => dailyMood = v);
+  mkChips('daily-hair',   HAIR_OPTS,       'default', 'on-teal',  v => dailyHair = v);
+  mkChips('daily-outfit', OUTFIT_OPTS,     'auto',    'on-teal',  v => dailyOutfit = v);
+  mkChips('daily-kling',  KLING_OPTS,      '5s',      'on-teal',  v => dailyKling = v);
+  mkChips('extract-hair',   HAIR_OPTS,         'default', 'on-teal',  v => extractHair = v);
+  mkChips('extract-outfit', EXTRACT_OUTFIT_OPTS,'auto',    'on-teal',  v => extractOutfit = v);
+  mkChips('has-mood',    MOOD_OPTS,    'thinking','on-coral', v => hasbaraMood = v);
+  mkChips('has-setting', SETTING_OPTS,'neutral', 'on-coral', v => hasbaraSetting = v);
+  mkChips('has-hair',    HAIR_OPTS,   'default', 'on-coral', v => hasbaraHair = v);
+  mkChips('has-outfit',  OUTFIT_OPTS, 'auto',    'on-coral', v => hasbaraOutfit = v);
+  mkChips('has-tone',    TONE_OPTS,   'cynical', 'on-coral', v => hasbaraTone = v);
+}
+
+function mkChips(containerId, opts, defaultVal, activeClass, setter) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  opts.forEach(o => {
+    const c = document.createElement('div');
+    c.className = 'chip' + (o.v === defaultVal ? ' ' + activeClass : '');
+    c.textContent = o.l;
+    c.onclick = () => {
+      el.querySelectorAll('.chip').forEach(x => x.className = 'chip');
+      c.className = 'chip ' + activeClass;
+      setter(o.v);
+    };
+    el.appendChild(c);
+  });
+}
+
+// ── TAB SWITCHING ────────────────────────────────────────
+function go(tab) {
+  ['daily','extract','hasbara'].forEach(t => {
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+    const el = document.getElementById('tab-' + t);
+    el.className = 'tab' + (t === tab ? ' t-' + t : '');
+  });
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function getChar() { return document.getElementById('m-char').value.trim(); }
+function getRoom(r) { const ids = {bedroom:'m-bed',kitchen:'m-kit',salon:'m-sal',bathroom:'m-bath'}; return document.getElementById(ids[r])?.value.trim() || ''; }
+function getLang() { return document.querySelector('input[name=lang]:checked')?.value || 'english'; }
+
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escJ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,''); }
+
+function toast(m) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = m;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2000);
+}
+
+async function copyTxt(btn, txt) {
+  try { await navigator.clipboard.writeText(txt); btn.textContent = 'Copied ✓'; btn.classList.add('done'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1800); }
+  catch { btn.textContent = 'Failed'; }
+}
+
+function clearR(tab) {
+  document.getElementById(tab === 'hasbara' ? 'has-results' : tab + '-results').innerHTML = '';
+}
+
+// ── API ──────────────────────────────────────────────────
+async function api(system, user, useSearch = false) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4000,
+    system,
+    messages: [{ role: 'user', content: user }]
+  };
+  if (useSearch) body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': KEY,
+    'anthropic-version': '2023-06-01',
+    'anthropic-beta': 'web-search-2025-03-05',
+    'anthropic-dangerous-direct-browser-access': 'true'
+  };
+
+  let msgs = [...body.messages];
+  let fullText = '';
+
+  for (let turn = 0; turn < 8; turn++) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers,
+      body: JSON.stringify({ ...body, messages: msgs })
+    });
+    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || 'HTTP ' + res.status); }
+    const d = await res.json();
+    fullText += d.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const hasTools = d.content.some(b => b.type === 'tool_use');
+    if (!hasTools || d.stop_reason === 'end_turn') break;
+    const results = d.content.filter(b => b.type === 'tool_use').map(b => ({ type: 'tool_result', tool_use_id: b.id, content: b.input ? JSON.stringify(b.input) : '' }));
+    msgs = [...msgs, { role: 'assistant', content: d.content }, { role: 'user', content: results }];
+  }
+  return fullText;
+}
+
+async function apiWithImage(system, userText, b64, mtype) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      system,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: mtype, data: b64 } },
+        { type: 'text', text: userText }
+      ]}]
+    })
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || 'HTTP ' + res.status); }
+  const d = await res.json();
+  return d.content.filter(b => b.type === 'text').map(b => b.text).join('');
+}
+
+function parseJSON(raw, arr) {
+  const clean = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  try { return JSON.parse(clean); } catch {}
+  const s = clean.indexOf(arr ? '[' : '{');
+  const e = clean.lastIndexOf(arr ? ']' : '}');
+  if (s !== -1 && e > s) {
+    try { return JSON.parse(clean.slice(s, e + 1)); } catch {}
+    try { return JSON.parse(clean.slice(s, e + 1).replace(/,\s*([\]\}])/g,'$1')); } catch {}
+  }
+  throw new Error('Could not parse response. Raw preview: ' + raw.slice(0, 200));
+}
+
+// ── RENDER HELPERS ───────────────────────────────────────
+function makeCard(badgeClass, badgeText, topic, sections, delay) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.animationDelay = delay + 's';
+  const rows = sections.map(s => {
+    if (!s.text) return '';
+    return `<div>
+      <div class="sec-label ${s.cls||''}">${escH(s.label)}</div>
+      <div class="prompt-box" ${s.rtl ? 'dir="rtl"' : ''}>${escH(s.text)}</div>
+      <button class="copy-btn" onclick="copyTxt(this,'${escJ(s.text)}')">Copy</button>
+    </div>`;
+  }).join('');
+  card.innerHTML = `
+    <div class="card-head">
+      <span class="badge ${badgeClass}">${badgeText}</span>
+      <span class="card-topic">${escH(topic||'')}</span>
+    </div>
+    <div class="card-body">${rows}</div>`;
+  return card;
+}
+
+// ── DAILY AGENT ──────────────────────────────────────────
+async function runDaily() {
+  if (!KEY) { alert('No API key'); return; }
+  const btn = document.getElementById('daily-btn');
+  const load = document.getElementById('daily-load');
+  const res = document.getElementById('daily-results');
+  btn.disabled = true; load.classList.add('show');
+
+  const char = getChar();
+  const scene = dailyScene;
+  const homeRooms = { bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'), salon: getRoom('salon'), bathroom: getRoom('bathroom') };
+  const outdoorNote = document.getElementById('outdoor-note')?.value.trim() || '';
+  const sceneDesc = {
+    'bedroom': homeRooms.bedroom, 'kitchen': homeRooms.kitchen,
+    'salon': homeRooms.salon, 'bathroom': homeRooms.bathroom,
+    'israel-street': 'A Tel Aviv street — warm Israeli city, mix of Bauhaus buildings and modern storefronts, Hebrew signs visible, warm Mediterranean light' + (outdoorNote ? '. Specific detail: ' + outdoorNote : ''),
+    'cafe': 'An Israeli café — warm wood interior, small marble table, espresso cup, other patrons blurred, warm ambient light' + (outdoorNote ? '. Specific detail: ' + outdoorNote : ''),
+    'beach': 'Tel Aviv beach — Mediterranean, white sand, clear blue sea, warm golden hour light' + (outdoorNote ? '. Specific detail: ' + outdoorNote : ''),
+    'gym': 'A modern gym — industrial feel, equipment visible in background, natural window light' + (outdoorNote ? '. Specific detail: ' + outdoorNote : ''),
+    'market': 'Mahane Yehuda or Carmel market — colorful stalls, produce, Israeli street market energy, Hebrew signs visible' + (outdoorNote ? '. Specific detail: ' + outdoorNote : ''),
+    'outdoor': (outdoorNote ? outdoorNote + ', Israel' : 'Israeli park or outdoor urban space — Mediterranean vegetation, warm light, Bauhaus architecture in background')
+  };
+  const locationDesc = sceneDesc[scene] || 'Israeli outdoor setting';
+  const hairLine = HAIR_DESC[dailyHair] || HAIR_DESC['default'];
+  const outfitLine = OUTFIT_DESC[dailyOutfit] || 'choose something natural and fitting for the scene';
+  const moodLine = (dailyMood !== 'none' && DAILY_MOOD_DESC[dailyMood])
+    ? 'Mood/Expression for all shots: ' + DAILY_MOOD_DESC[dailyMood]
+    : 'Mood/Expression: natural and relaxed — no specific mood, keep it candid';
+  const klingLine = KLING_DESC[dailyKling] || KLING_DESC['5s'];
+
+  const system = `You are a creative director generating Nano Banana image prompts for Mika's Instagram lifestyle account.
+Mika's appearance: ${char}
+Hair: ${hairLine}
+Outfit: ${outfitLine}
+${NECKLACE}
+Scene/location: ${locationDesc}
+${moodLine}
+${AUTHENTICITY}
+Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
+Return JSON only:
+{"scene_summary":"one line","main_prompt":"full prompt","variants":[{"pose_note":"brief","prompt":"full prompt"},{"pose_note":"brief","prompt":"full prompt"},{"pose_note":"brief","prompt":"full prompt"}],"kling_main":"${klingLine}","caption_idea":"casual English caption"}`;
+
+  try {
+    const raw = await api(system, `Generate lifestyle prompts for Mika in scene: ${scene}`, false);
+    const data = parseJSON(raw, false);
+    const entry = { date: now(), scene, summary: data.scene_summary || scene, data };
+    histDaily.unshift(entry); if (histDaily.length > 12) histDaily.pop();
+    localStorage.setItem('ms_hist_daily', JSON.stringify(histDaily));
+    renderDailyData(res, data);
+    renderAllHist();
+  } catch(e) {
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+function renderDailyData(container, data) {
+  container.innerHTML = '';
+  container.appendChild(makeCard('badge-teal','MAIN SHOT', data.scene_summary || '', [
+    { label:'Nano Banana — Hero prompt', cls:'t', text: data.main_prompt },
+    { label:'KLING3 — Animation', cls:'g', text: data.kling_main },
+    { label:'Caption idea', cls:'c', text: data.caption_idea }
+  ], 0));
+  (data.variants || []).forEach((v, i) => {
+    container.appendChild(makeCard('badge', 'VARIANT ' + (i+1), v.pose_note || '', [
+      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt }
+    ], (i+1) * 0.09));
+  });
+}
+
+// ── EXTRACT AGENT ────────────────────────────────────────
+function onFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
+  imgType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imgB64 = ev.target.result.split(',')[1];
+    document.getElementById('preview-img').src = ev.target.result;
+    document.getElementById('preview-name').textContent = file.name + ' · ' + (file.size/1024).toFixed(0) + ' KB';
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('extract-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImg() {
+  imgB64 = null;
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('extract-btn').disabled = true;
+  try { document.getElementById('img-file').value = ''; } catch {}
+  document.getElementById('extract-results').innerHTML = '';
+}
+
+async function runExtract() {
+  if (!KEY || !imgB64) return;
+  const btn = document.getElementById('extract-btn');
+  const load = document.getElementById('extract-load');
+  const res = document.getElementById('extract-results');
+  btn.disabled = true; load.classList.add('show');
+  document.getElementById('extract-load-txt').textContent = 'Analyzing image...';
+
+  const char = getChar();
+  const hairLine = HAIR_DESC[extractHair] || HAIR_DESC['default'];
+  const outfitOverride = OUTFIT_DESC[extractOutfit];
+  const homeRooms = { bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'), salon: getRoom('salon'), bathroom: getRoom('bathroom') };
+
+  const system = `You are a creative director analyzing reference images to generate Nano Banana AI image prompts for a character named Mika.
+Mika's appearance (ALWAYS use — never describe the uploaded person): ${char}
+${NECKLACE}
+Hair: ${hairLine}
+${outfitOverride ? 'Outfit override: ' + outfitOverride : 'Outfit: extract from the image and adapt to Mika'}
+Home room library (use EXACTLY when scene matches — do NOT copy background from the photo):
+- Bedroom: ${homeRooms.bedroom}
+- Kitchen: ${homeRooms.kitchen}
+- Living room: ${homeRooms.salon}
+- Bathroom: ${homeRooms.bathroom}
+RULES: 1) Analyze image for pose, expression, outfit, setting, lighting, angle, mood. 2) For background: if bedroom/kitchen/living room/bathroom → use saved description exactly. Otherwise describe faithfully from the photo. 3) Replace the person entirely with Mika — same pose, same energy, same scene. 4) ${AUTHENTICITY} 5) Generate 1 main + 3 pose variants in same location.
+Return JSON only:
+{"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","variants":[{"pose_note":"brief","prompt":"full"},{"pose_note":"brief","prompt":"full"},{"pose_note":"brief","prompt":"full"}],"kling_main":"KLING3 2-3 sec subtle animation","caption_idea":"casual caption"}`;
+
+  try {
+    const raw = await apiWithImage(system, 'Analyze this image and generate the full prompt set for Mika.', imgB64, imgType);
+    const data = parseJSON(raw, false);
+    const entry = { date: now(), scene: data.scene_detected || 'Extracted', data };
+    histExtract.unshift(entry); if (histExtract.length > 12) histExtract.pop();
+    localStorage.setItem('ms_hist_extract', JSON.stringify(histExtract));
+    renderExtractData(res, data);
+    renderAllHist();
+  } catch(e) {
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+function renderExtractData(container, data) {
+  container.innerHTML = '';
+  const bgSrc = data.background_source === 'library' ? '🏠 Your saved room' : '📷 From photo';
+  container.appendChild(makeCard('badge-gold','EXTRACTED', data.scene_detected || '', [
+    { label:'Background source', cls:'g', text: bgSrc },
+    { label:'Pose extracted', cls:'', text: data.pose_extracted }
+  ], 0));
+  container.appendChild(makeCard('badge-teal','MAIN SHOT', '', [
+    { label:'Nano Banana — Hero prompt', cls:'t', text: data.main_prompt },
+    { label:'KLING3 — Animation', cls:'g', text: data.kling_main },
+    { label:'Caption idea', cls:'c', text: data.caption_idea }
+  ], 0.08));
+  (data.variants || []).forEach((v, i) => {
+    container.appendChild(makeCard('badge', 'VARIANT ' + (i+1), v.pose_note || '', [
+      { label:'Nano Banana — Variant ' + (i+1), cls:'t', text: v.prompt }
+    ], (i+2) * 0.09));
+  });
+}
+
+// ── HASBARA / IMAGE STUDIO ───────────────────────────────
+async function runHasbara() {
+  if (!KEY) { alert('No API key'); return; }
+  const btn = document.getElementById('has-btn');
+  const load = document.getElementById('has-load');
+  const res = document.getElementById('has-results');
+  btn.disabled = true; load.classList.add('show');
+
+  const char = getChar();
+  const topic = document.getElementById('has-topic').value.trim();
+  const lang = getLang();
+  const hairLine = HAIR_DESC[hasbaraHair] || HAIR_DESC['default'];
+  const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'choose something natural and fitting for the mood and setting';
+  const topicLine = topic ? `The message/topic Mika is reacting to: "${topic}"` : 'Generate a general strong Israeli identity / pride visual — no specific topic needed.';
+
+  const system = `You are a creative director generating Nano Banana image prompts for Mika's Israeli advocacy Instagram account.
+Mika's appearance: ${char}
+${NECKLACE}
+Hair: ${hairLine}
+Outfit: ${outfitLine}
+${AUTHENTICITY}
+Generate ONE complete image prompt set. Return JSON only:
+{"nano_prompt":"full Nano Banana prompt including appearance, hair, outfit, necklace, expression, setting, authenticity","kling_prompt":"KLING3 2-3 sec subtle natural movement matching the mood","caption_en":"sharp punchy English caption${lang==='hebrew'?' (optional)':' (required)'}","caption_he":"Hebrew caption${lang==='english'?' (optional)':' (required)'}","post_idea":"one sentence: ideal use case for this image"}`;
+
+  const user = `${topicLine}
+Mood/Expression: ${MOOD_DESC[hasbaraMood] || MOOD_DESC.thinking}
+Setting: ${SETTING_DESC[hasbaraSetting] || SETTING_DESC.neutral}
+Caption tone: ${TONE_DESC[hasbaraTone] || TONE_DESC.cynical}`;
+
+  try {
+    const raw = await api(system, user, false);
+    const data = parseJSON(raw, false);
+    const entry = { date: now(), topic: topic || 'General', mood: hasbaraMood, data: [data] };
+    histHasbara.unshift(entry); if (histHasbara.length > 12) histHasbara.pop();
+    localStorage.setItem('ms_hist_hasbara', JSON.stringify(histHasbara));
+    renderHasbaraData(res, [data]);
+    renderAllHist();
+  } catch(e) {
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+function renderHasbaraData(container, items) {
+  container.innerHTML = '';
+  items.forEach((item, i) => {
+    container.appendChild(makeCard('badge-coral','IMAGE STUDIO', item.post_idea || '', [
+      { label:'Nano Banana — Full prompt', cls:'g', text: item.nano_prompt },
+      { label:'KLING3 — Animation', cls:'t', text: item.kling_prompt },
+      { label:'Caption (EN)', cls:'c', text: item.caption_en },
+      { label:'Caption (עברית)', cls:'c', text: item.caption_he, rtl: true }
+    ], i * 0.08));
+  });
+}
+
+// ── HISTORY ──────────────────────────────────────────────
+function now() {
+  return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderAllHist() {
+  renderHist('daily-hist', histDaily, 'teal', i => {
+    const e = histDaily[i]; if (!e?.data) return;
+    clearR('daily'); renderDailyData(document.getElementById('daily-results'), e.data);
+    document.getElementById('daily-results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, h => h.summary || h.scene);
+
+  renderHist('extract-hist', histExtract, 'gold', i => {
+    const e = histExtract[i]; if (!e?.data) return;
+    clearR('extract'); renderExtractData(document.getElementById('extract-results'), e.data);
+    document.getElementById('extract-results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, h => h.scene);
+
+  renderHist('has-hist', histHasbara, 'coral', i => {
+    const e = histHasbara[i]; if (!e?.data) return;
+    clearR('hasbara'); renderHasbaraData(document.getElementById('has-results'), e.data);
+    document.getElementById('has-results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, h => h.topic || 'Generation');
+}
+
+function renderHist(elId, arr, color, onClick, labelFn) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!arr.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:6px 0">Nothing yet.</div>'; return; }
+  el.innerHTML = arr.map((h, i) => `
+    <div class="hist-item" onclick="(${onClick.toString()})(${i})">
+      <div class="hist-date">${h.date || ''}</div>
+      <div class="hist-row">
+        <span class="hist-label">${escH(labelFn(h))}</span>
+        <span class="hist-load" style="color:var(--${color})">↺ Load</span>
+      </div>
+    </div>`).join('');
+}
+
+function clearHist(tab) {
+  if (tab === 'daily')   { histDaily = [];   localStorage.removeItem('ms_hist_daily'); }
+  if (tab === 'extract') { histExtract = []; localStorage.removeItem('ms_hist_extract'); }
+  if (tab === 'hasbara') { histHasbara = []; localStorage.removeItem('ms_hist_hasbara'); }
+  renderAllHist();
+}
+
+// ── SCENE PICKER ─────────────────────────────────────────
+const OUTDOOR_SCENES = new Set(['israel-street','cafe','beach','gym','market','outdoor']);
+function pickScene(el) {
+  document.querySelectorAll('#daily-scenes .scene').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+  dailyScene = el.dataset.s;
+  const wrap = document.getElementById('outdoor-note-wrap');
+  if (wrap) wrap.style.display = OUTDOOR_SCENES.has(dailyScene) ? 'block' : 'none';
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal(e) { if (e.target.id === 'modal') document.getElementById('modal').classList.remove('open'); }
+function saveSettings() {
+  const k = document.getElementById('m-key').value.trim();
+  if (k) { KEY = k; localStorage.setItem('ms_key', k); }
+  const map = [['m-char','ms_char'],['m-bed','ms_bed'],['m-kit','ms_kit'],['m-sal','ms_sal'],['m-bath','ms_bath']];
+  map.forEach(([id,key]) => localStorage.setItem(key, document.getElementById(id).value.trim()));
+  const lang = document.querySelector('input[name=lang]:checked')?.value || 'english';
+  localStorage.setItem('ms_lang', lang);
+  document.getElementById('modal').classList.remove('open');
+  toast('Settings saved ✓');
+}
+
+// ── UTIL ─────────────────────────────────────────────────
+function errCard(msg) {
+  return `<div style="padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);color:var(--text2);font-size:12px;line-height:1.7">${escH(msg)}</div>`;
+}
+
+renderAllHist();
+</script>
+</body>
+</html>
