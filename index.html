@@ -445,7 +445,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="divider"></div>
     <div>
       <div class="lbl">Character description</div>
-      <textarea class="field" id="m-char" rows="4">A 175cm tall young woman in her mid-20s with long straight blonde hair with lighter highlights, blue-green eyes, light skin with very subtle freckles scattered across the nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. When holding her phone: modern iPhone space gray, slim dark navy matte case, no logos.</textarea>
+      <textarea class="field" id="m-char" rows="4">A 175cm tall young woman in her mid-20s with long straight blonde hair with lighter highlights, bright blue eyes, light skin with very subtle freckles scattered across the nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. When holding her phone: modern iPhone space gray, slim dark navy matte case, no logos.</textarea>
     </div>
     <div class="divider"></div>
     <div><div class="lbl">Bedroom</div><textarea class="field" id="m-bed" rows="3">Modern warm Tel Aviv apartment bedroom. White walls, light oak wood bed frame with rumpled white linen, warm pendant light on nightstand, sheer curtains letting in morning light. Slightly lived-in — maybe a jacket on the chair, phone charger on the floor.</textarea></div>
@@ -474,6 +474,8 @@ let hasbaraMode = 'natural';
 let extractMode = 'natural';
 let _dailyLastSystem = '';
 let _dailyLastScene = '';
+let _dailyLastOutfit = '';
+let _hasbaraLastOutfit = '';
 let dailyMood = 'none';
 let dailyHair = 'default';
 let dailyOutfit = 'auto';
@@ -859,10 +861,11 @@ ${moodLine}
 ${AUTHENTICITY}
 Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
 Return JSON only:
-{"scene_summary":"one line","main_prompt":"full prompt","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
+{"scene_summary":"one line","main_prompt":"full prompt","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
 
   try {
     _dailyLastSystem = system;
+    _dailyLastOutfit = outfitLine;
     const raw = await api(system, `Generate lifestyle prompts for Mika in scene: ${scene}`, false);
     const data = parseJSON(raw, false);
     const entry = { date: now(), scene, summary: data.scene_summary || scene, data };
@@ -1015,6 +1018,7 @@ Caption tone: ${TONE_DESC[hasbaraTone] || TONE_DESC.cynical}`;
     const entry = { date: now(), topic: topic || 'General', mood: hasbaraMood, data: [data] };
     histHasbara.unshift(entry); if (histHasbara.length > 12) histHasbara.pop();
     localStorage.setItem('ms_hist_hasbara', JSON.stringify(histHasbara));
+    _hasbaraLastOutfit = OUTFIT_DESC[hasbaraOutfit] || 'natural fitting outfit';
     renderHasbaraData(res, [data]);
     renderAllHist();
     document.getElementById('has-add-btns').style.display = 'flex';
@@ -1214,7 +1218,7 @@ CRITICAL OUTPUT RULE: You MUST respond with ONLY a raw JSON array. No intro text
       "hair": "one of: default / ponytail / wavy / half-up / messy-bun / high-bun",
       "outfit": "describe briefly what Mika should wear"
     },
-    "nano_prompt_with_text": "Complete Nano Banana image generation prompt WITH text overlay. You MUST follow this exact recipe: MIKA APPEARANCE (always include verbatim): 175cm tall young woman in her mid-20s, long straight blonde hair with lighter highlights, blue-green eyes, light skin with very subtle freckles on nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. Always wearing a delicate gold necklace with a small Magen David (Star of David) pendant clearly visible. When holding a phone: modern iPhone space gray, slim dark navy matte case, no logos or patterns.  AUTHENTICITY RECIPE (always apply — this is what makes her look real, not AI): - Frame: CLOSE-UP or MEDIUM-CLOSE only — face and shoulders, or face and upper chest. Never wide/full-body shots. - Background: blurred shallow depth of field (bokeh) — background suggests the location but is never sharp or detailed - Lighting: natural, uneven, slightly imperfect — window light, golden hour sun, café ambient warmth. A touch of overexposure or slight shadow is good. Never flat even studio lighting. - Angle: slightly imperfect, as if taken on an iPhone by herself or a friend. Off-center is good. Never perfectly centered magazine composition. - Environment feel: lived-in and real — if indoors, there may be a small item out of place, a half-drunk coffee, a phone charger. Not staged. - Overall: the image must look like a real candid iPhone photo posted to Instagram — NOT a studio shoot, NOT an AI render, NOT a fashion editorial. THEN add: chosen hair style from mika_studio settings, chosen outfit, chosen mood/expression and body language, specific location/setting (close-up framing, blurred background). FINALLY add TEXT OVERLAY: two lines of bold white sans-serif text — English hook sentence on top line, Hebrew hook sentence on second line — positioned in lower third of image, semi-transparent dark backdrop behind text, never overlapping Mika face.",
+    "nano_prompt_with_text": "Complete Nano Banana image generation prompt WITH text overlay. You MUST follow this exact recipe: MIKA APPEARANCE (always include verbatim): 175cm tall young woman in her mid-20s, long straight blonde hair with lighter highlights, bright blue eyes, light skin with very subtle freckles on nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. Always wearing a delicate gold necklace with a small Magen David (Star of David) pendant clearly visible. When holding a phone: modern iPhone space gray, slim dark navy matte case, no logos or patterns.  AUTHENTICITY RECIPE (always apply — this is what makes her look real, not AI): - Frame: CLOSE-UP or MEDIUM-CLOSE only — face and shoulders, or face and upper chest. Never wide/full-body shots. - Background: blurred shallow depth of field (bokeh) — background suggests the location but is never sharp or detailed - Lighting: natural, uneven, slightly imperfect — window light, golden hour sun, café ambient warmth. A touch of overexposure or slight shadow is good. Never flat even studio lighting. - Angle: slightly imperfect, as if taken on an iPhone by herself or a friend. Off-center is good. Never perfectly centered magazine composition. - Environment feel: lived-in and real — if indoors, there may be a small item out of place, a half-drunk coffee, a phone charger. Not staged. - Overall: the image must look like a real candid iPhone photo posted to Instagram — NOT a studio shoot, NOT an AI render, NOT a fashion editorial. THEN add: chosen hair style from mika_studio settings, chosen outfit, chosen mood/expression and body language, specific location/setting (close-up framing, blurred background). FINALLY add TEXT OVERLAY: two lines of bold white sans-serif text — English hook sentence on top line, Hebrew hook sentence on second line — positioned in lower third of image, semi-transparent dark backdrop behind text, never overlapping Mika face.",
     "nano_prompt_clean": "Identical to nano_prompt_with_text but with the TEXT OVERLAY section completely removed — pure clean Mika image the user will add text to manually",
     "kling_prompt": "KLING3 animation prompt — 3-5 seconds of subtle natural movement matching the mood and setting. Even for static posts include this so it can become a reel",
     "trending_angle": "What current trend or moment this taps into"
@@ -1416,7 +1420,7 @@ async function addOneVariant(tab, mode) {
   if (tab === 'daily') {
     if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
     system = _dailyLastSystem;
-    user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
+    user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the previous variants: ${_dailyLastOutfit || outfitLine}. Only the pose changes. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt — must include the exact same outfit described","kling":"KLING3 prompt"}`;
   } else {
     const hairLine   = HAIR_DESC[hasbaraHair]   || HAIR_DESC['default'];
     const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'natural and fitting';
@@ -1426,7 +1430,7 @@ Mika: ${char} ${NECKLACE}
 Hair: ${hairLine} | Outfit: ${outfitLine}
 ${AUTHENTICITY}
 Return JSON only: {"pose_note":"brief description","prompt":"complete Nano Banana prompt","kling":"KLING3 animation 3-5 sec"}`;
-    user = `Topic: ${topic || 'Israeli pride/advocacy'}. Mood: ${MOOD_DESC[hasbaraMood]||'natural'}. Setting: ${SETTING_DESC[hasbaraSetting]||'neutral'}. Style: ${modeInstruction}. This is variant #${prevCount + 1} — make it different from previous ones.`;
+    user = `Topic: ${topic || 'Israeli pride/advocacy'}. Mood: ${MOOD_DESC[hasbaraMood]||'natural'}. Setting: ${SETTING_DESC[hasbaraSetting]||'neutral'}. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the first image: ${_hasbaraLastOutfit || outfitLine}. Only the pose/expression changes. This is variant #${prevCount + 1} — make it different from previous ones.`;
   }
 
   try {
