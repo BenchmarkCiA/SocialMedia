@@ -176,6 +176,13 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .s-mika-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
 .s-mika-val{font-size:12px;color:var(--text);line-height:1.6;}
 
+.mode-toggle{display:flex;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:18px;width:fit-content;}
+.mode-btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .2s;}
+.mode-btn.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.btn-load-more{background:none;border:1px dashed var(--border2);border-radius:var(--r);padding:10px 18px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px;display:none;}
+.btn-load-more:hover{border-color:var(--teal);color:var(--teal);}
+.btn-load-more.show{display:block;}
+
 /* MOBILE */
 @media(max-width:600px){
   .panel{padding:16px 12px;}
@@ -230,6 +237,12 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="p-title">Daily Profile</div>
     <div class="p-desc">Generate authentic Nano Banana + KLING3 prompts for Mika's lifestyle content — consistent home environments, 1 hero shot + 3 variants.</div>
 
+    <div class="lbl">Prompt style</div>
+    <div class="mode-toggle" id="daily-mode-toggle">
+      <button class="mode-btn active" onclick="setMode('daily','natural',this)">✦ Natural</button>
+      <button class="mode-btn" onclick="setMode('daily','candid',this)">📸 Candid / Creative</button>
+    </div>
+
     <div class="lbl">Scene</div>
     <div class="scenes" id="daily-scenes">
       <div class="scene on" data-s="bedroom" onclick="pickScene(this)"><span class="scene-icon">🛏</span><span class="scene-name">Bedroom</span></div>
@@ -266,6 +279,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="daily-load"><div class="spin"></div><span id="daily-load-txt">Building prompts for Mika...</span></div>
     <div class="cards" id="daily-results"></div>
+    <button class="btn-load-more" id="daily-load-more" onclick="loadMoreDaily()">+ Load 3 more variants</button>
     <div class="hist-head"><span class="hist-title">Saved prompts</span><button class="hist-clear" onclick="clearHist('daily')">Clear all</button></div>
     <div class="hist-list" id="daily-hist"></div>
   </div>
@@ -343,6 +357,12 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="p-title">Image Studio</div>
     <div class="p-desc">Generate Mika visuals for your advocacy account — pick mood, setting, hair, outfit, add an optional topic and get full Nano Banana + KLING3 prompts and captions.</div>
 
+    <div class="lbl">Prompt style</div>
+    <div class="mode-toggle" id="has-mode-toggle">
+      <button class="mode-btn active" onclick="setMode('hasbara','natural',this)">✦ Natural</button>
+      <button class="mode-btn" onclick="setMode('hasbara','candid',this)">📸 Candid / Creative</button>
+    </div>
+
     <div class="lbl">Mood</div>
     <div class="chips" id="has-mood"></div>
     <div class="lbl">Setting</div>
@@ -365,6 +385,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="has-load"><div class="spin"></div><span>Generating Mika visuals...</span></div>
     <div class="cards" id="has-results"></div>
+    <button class="btn-load-more" id="has-load-more" onclick="loadMoreHasbara()">+ Load 3 more variants</button>
     <div class="hist-head"><span class="hist-title">Previous generations</span><button class="hist-clear" onclick="clearHist('hasbara')">Clear all</button></div>
     <div class="hist-list" id="has-hist"></div>
   </div>
@@ -444,6 +465,11 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 // ── STATE ────────────────────────────────────────────────
 let KEY = '';
 let dailyScene = 'bedroom';
+let dailyMode = 'natural';
+let hasbaraMode = 'natural';
+let extractMode = 'natural';
+let _dailyLastSystem = '';
+let _dailyLastScene = '';
 let dailyMood = 'none';
 let dailyHair = 'default';
 let dailyOutfit = 'auto';
@@ -807,6 +833,12 @@ async function runDaily() {
   const locationDesc = sceneDesc[scene] || 'Israeli outdoor setting';
   const hairLine = HAIR_DESC[dailyHair] || HAIR_DESC['default'];
   const outfitLine = OUTFIT_DESC[dailyOutfit] || 'choose something natural and fitting for the scene';
+  const modeLine = MODE_DESC[dailyMode] || MODE_DESC.natural;
+  const modeInstruction = dailyMode === 'candid'
+    ? 'POSE STYLE: ' + modeLine + ' Generate poses that feel like genuine candid moments, not model poses.'
+    : 'POSE STYLE: ' + modeLine;
+  _dailyLastScene = scene;
+
   const moodLine = (dailyMood !== 'none' && DAILY_MOOD_DESC[dailyMood])
     ? 'Mood/Expression for all shots: ' + DAILY_MOOD_DESC[dailyMood]
     : 'Mood/Expression: natural and relaxed — no specific mood, keep it candid';
@@ -818,6 +850,7 @@ Hair: ${hairLine}
 Outfit: ${outfitLine}
 ${NECKLACE}
 Scene/location: ${locationDesc}
+${modeInstruction}
 ${moodLine}
 ${AUTHENTICITY}
 Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
@@ -825,6 +858,7 @@ Return JSON only:
 {"scene_summary":"one line","main_prompt":"full prompt","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
 
   try {
+    _dailyLastSystem = system;
     const raw = await api(system, `Generate lifestyle prompts for Mika in scene: ${scene}`, false);
     const data = parseJSON(raw, false);
     const entry = { date: now(), scene, summary: data.scene_summary || scene, data };
@@ -832,6 +866,7 @@ Return JSON only:
     localStorage.setItem('ms_hist_daily', JSON.stringify(histDaily));
     renderDailyData(res, data);
     renderAllHist();
+    document.getElementById('daily-load-more').classList.add('show');
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -954,11 +989,13 @@ async function runHasbara() {
   const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'choose something natural and fitting for the mood and setting';
   const topicLine = topic ? `The message/topic Mika is reacting to: "${topic}"` : 'Generate a general strong Israeli identity / pride visual — no specific topic needed.';
 
+  const hasModeInstruction = MODE_DESC[hasbaraMode] || MODE_DESC.natural;
   const system = `You are a creative director generating Nano Banana image prompts for Mika's Israeli advocacy Instagram account.
 Mika's appearance: ${char}
 ${NECKLACE}
 Hair: ${hairLine}
 Outfit: ${outfitLine}
+Pose style: ${hasModeInstruction}
 ${AUTHENTICITY}
 Generate ONE complete image prompt set. Return JSON only:
 {"nano_prompt":"full Nano Banana prompt including appearance, hair, outfit, necklace, expression, setting, authenticity","kling_prompt":"KLING3 2-3 sec subtle natural movement matching the mood","caption_en":"sharp punchy English caption${lang==='hebrew'?' (optional)':' (required)'}","caption_he":"Hebrew caption${lang==='english'?' (optional)':' (required)'}","post_idea":"one sentence: ideal use case for this image"}`;
@@ -976,6 +1013,7 @@ Caption tone: ${TONE_DESC[hasbaraTone] || TONE_DESC.cynical}`;
     localStorage.setItem('ms_hist_hasbara', JSON.stringify(histHasbara));
     renderHasbaraData(res, [data]);
     renderAllHist();
+    document.getElementById('has-load-more').classList.add('show');
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1049,6 +1087,22 @@ function clearHist(tab) {
 }
 
 // ── SCENE PICKER ─────────────────────────────────────────
+const MODE_DESC = {
+  natural: 'Natural, relaxed poses — standing, sitting, looking at camera or slightly away. Clean and polished but authentic.',
+  candid: 'Caught in a real moment — mid-laugh, fixing hair, lying on sofa scrolling phone, leaning against a wall looking away, sitting on a counter, glancing out a window. Feels like a real person caught naturally, NOT a posed model shoot. The viewer should feel like they caught a private moment.'
+};
+
+function setMode(tab, mode, btn) {
+  const toggleId = tab === 'daily' ? 'daily-mode-toggle' : tab === 'hasbara' ? 'has-mode-toggle' : null;
+  if (toggleId) {
+    document.querySelectorAll('#' + toggleId + ' .mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (tab === 'daily') dailyMode = mode;
+  else if (tab === 'hasbara') hasbaraMode = mode;
+  else if (tab === 'extract') extractMode = mode;
+}
+
 const OUTDOOR_SCENES = new Set(['israel-street','cafe','beach','gym','market','outdoor']);
 function pickScene(el) {
   document.querySelectorAll('#daily-scenes .scene').forEach(s => s.classList.remove('on'));
@@ -1336,6 +1390,72 @@ function renderSasha(container, ideas) {
       </div>`;
     container.appendChild(card);
   });
+}
+
+// ── LOAD MORE VARIANTS ──────────────────────────────────
+async function loadMoreDaily() {
+  if (!KEY || !_dailyLastSystem) return;
+  const btn = document.getElementById('daily-load-more');
+  const res = document.getElementById('daily-results');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  try {
+    const raw = await api(_dailyLastSystem, `Generate 3 MORE fresh pose variants for the same scene. Different poses and expressions from what you already gave — keep exact same background/location. Return JSON: {"variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt"},...]}`, false);
+    const data = parseJSON(raw, false);
+    if (data.variants && Array.isArray(data.variants)) {
+      const startIdx = res.querySelectorAll('.card').length;
+      data.variants.forEach((v, i) => {
+        const card = makeCard('badge', 'VARIANT ' + (startIdx + i + 1), v.pose_note || '', [
+          { label:'Nano Banana — Variant ' + (startIdx + i + 1), cls:'t', text: v.prompt },
+          { label:'KLING3 — Variant ' + (startIdx + i + 1), cls:'g', text: v.kling }
+        ], i * 0.09);
+        res.appendChild(card);
+      });
+    }
+  } catch(e) { res.insertAdjacentHTML('beforeend', errCard(e.message)); }
+
+  btn.disabled = false; btn.textContent = '+ Load 3 more variants';
+}
+
+async function loadMoreHasbara() {
+  if (!KEY) return;
+  const btn = document.getElementById('has-load-more');
+  const res = document.getElementById('has-results');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  // Re-read current selections
+  const char = getChar();
+  const hairLine = HAIR_DESC[hasbaraHair] || HAIR_DESC['default'];
+  const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'choose something natural and fitting';
+  const topic = document.getElementById('has-topic').value.trim();
+  const hasModeInstruction = MODE_DESC[hasbaraMode] || MODE_DESC.natural;
+
+  const system = `You are a creative director generating alternative Nano Banana image prompts for Mika's Israeli advocacy Instagram account.
+Mika: ${char} ${NECKLACE}
+Hair: ${hairLine} | Outfit: ${outfitLine}
+Pose style: ${hasModeInstruction}
+${AUTHENTICITY}
+Generate 3 MORE fresh image variants — different poses/expressions/angles from previous ones. Same character, same energy, fresh takes.
+Return JSON: {"variants":[{"pose_note":"brief description","prompt":"full Nano Banana prompt","kling":"KLING3 animation prompt"},{"pose_note":"...","prompt":"...","kling":"..."},{"pose_note":"...","prompt":"...","kling":"..."}]}`;
+
+  const user = `Topic: ${topic || 'General Israeli pride/advocacy visual'}. Mood: ${MOOD_DESC[hasbaraMood]}. Setting: ${SETTING_DESC[hasbaraSetting]}.`;
+
+  try {
+    const raw = await api(system, user, false);
+    const data = parseJSON(raw, false);
+    if (data.variants && Array.isArray(data.variants)) {
+      const startIdx = res.querySelectorAll('.card').length;
+      data.variants.forEach((v, i) => {
+        const card = makeCard('badge-coral', 'VARIANT ' + (startIdx + i + 1), v.pose_note || '', [
+          { label:'Nano Banana — Variant ' + (startIdx + i + 1), cls:'g', text: v.prompt },
+          { label:'KLING3 — Variant ' + (startIdx + i + 1), cls:'t', text: v.kling }
+        ], i * 0.09);
+        res.appendChild(card);
+      });
+    }
+  } catch(e) { res.insertAdjacentHTML('beforeend', errCard(e.message)); }
+
+  btn.disabled = false; btn.textContent = '+ Load 3 more variants';
 }
 
 // ── SAME PLACE NEW POSES ─────────────────────────────────
