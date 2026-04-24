@@ -179,9 +179,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .mode-toggle{display:flex;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:18px;width:fit-content;}
 .mode-btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .2s;}
 .mode-btn.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3);}
-.btn-load-more{background:none;border:1px dashed var(--border2);border-radius:var(--r);padding:10px 18px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px;display:none;}
-.btn-load-more:hover{border-color:var(--teal);color:var(--teal);}
-.btn-load-more.show{display:block;}
+
 
 /* MOBILE */
 @media(max-width:600px){
@@ -279,7 +277,10 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="daily-load"><div class="spin"></div><span id="daily-load-txt">Building prompts for Mika...</span></div>
     <div class="cards" id="daily-results"></div>
-    <button class="btn-load-more" id="daily-load-more" onclick="loadMoreDaily()">+ Load 3 more variants</button>
+    <div id="daily-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('daily','natural')">+ Add natural pose</button>
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('daily','candid')">+ Add candid pose</button>
+    </div>
     <div class="hist-head"><span class="hist-title">Saved prompts</span><button class="hist-clear" onclick="clearHist('daily')">Clear all</button></div>
     <div class="hist-list" id="daily-hist"></div>
   </div>
@@ -385,7 +386,10 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="has-load"><div class="spin"></div><span>Generating Mika visuals...</span></div>
     <div class="cards" id="has-results"></div>
-    <button class="btn-load-more" id="has-load-more" onclick="loadMoreHasbara()">+ Load 3 more variants</button>
+    <div id="has-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('hasbara','natural')">+ Add natural pose</button>
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('hasbara','candid')">+ Add candid pose</button>
+    </div>
     <div class="hist-head"><span class="hist-title">Previous generations</span><button class="hist-clear" onclick="clearHist('hasbara')">Clear all</button></div>
     <div class="hist-list" id="has-hist"></div>
   </div>
@@ -866,7 +870,7 @@ Return JSON only:
     localStorage.setItem('ms_hist_daily', JSON.stringify(histDaily));
     renderDailyData(res, data);
     renderAllHist();
-    document.getElementById('daily-load-more').classList.add('show');
+    document.getElementById('daily-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1013,7 +1017,7 @@ Caption tone: ${TONE_DESC[hasbaraTone] || TONE_DESC.cynical}`;
     localStorage.setItem('ms_hist_hasbara', JSON.stringify(histHasbara));
     renderHasbaraData(res, [data]);
     renderAllHist();
-    document.getElementById('has-load-more').classList.add('show');
+    document.getElementById('has-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1392,70 +1396,57 @@ function renderSasha(container, ideas) {
   });
 }
 
-// ── LOAD MORE VARIANTS ──────────────────────────────────
-async function loadMoreDaily() {
-  if (!KEY || !_dailyLastSystem) return;
-  const btn = document.getElementById('daily-load-more');
-  const res = document.getElementById('daily-results');
-  btn.disabled = true; btn.textContent = 'Generating...';
-
-  try {
-    const raw = await api(_dailyLastSystem, `Generate 3 MORE fresh pose variants for the same scene. Different poses and expressions from what you already gave — keep exact same background/location. Return JSON: {"variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt"},...]}`, false);
-    const data = parseJSON(raw, false);
-    if (data.variants && Array.isArray(data.variants)) {
-      const startIdx = res.querySelectorAll('.card').length;
-      data.variants.forEach((v, i) => {
-        const card = makeCard('badge', 'VARIANT ' + (startIdx + i + 1), v.pose_note || '', [
-          { label:'Nano Banana — Variant ' + (startIdx + i + 1), cls:'t', text: v.prompt },
-          { label:'KLING3 — Variant ' + (startIdx + i + 1), cls:'g', text: v.kling }
-        ], i * 0.09);
-        res.appendChild(card);
-      });
-    }
-  } catch(e) { res.insertAdjacentHTML('beforeend', errCard(e.message)); }
-
-  btn.disabled = false; btn.textContent = '+ Load 3 more variants';
-}
-
-async function loadMoreHasbara() {
+// ── ADD ONE VARIANT ──────────────────────────────────────
+async function addOneVariant(tab, mode) {
   if (!KEY) return;
-  const btn = document.getElementById('has-load-more');
-  const res = document.getElementById('has-results');
-  btn.disabled = true; btn.textContent = 'Generating...';
+  const btnsId = tab === 'daily' ? 'daily-add-btns' : 'has-add-btns';
+  const resId  = tab === 'daily' ? 'daily-results'  : 'has-results';
+  const btns   = document.getElementById(btnsId);
+  const res    = document.getElementById(resId);
+  const prevCount = res.querySelectorAll('.card').length;
 
-  // Re-read current selections
+  // Disable buttons while loading
+  btns.querySelectorAll('button').forEach(b => { b.disabled = true; b.style.opacity = '.5'; });
+
+  const modeInstruction = MODE_DESC[mode] || MODE_DESC.natural;
   const char = getChar();
-  const hairLine = HAIR_DESC[hasbaraHair] || HAIR_DESC['default'];
-  const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'choose something natural and fitting';
-  const topic = document.getElementById('has-topic').value.trim();
-  const hasModeInstruction = MODE_DESC[hasbaraMode] || MODE_DESC.natural;
 
-  const system = `You are a creative director generating alternative Nano Banana image prompts for Mika's Israeli advocacy Instagram account.
+  let system, user;
+
+  if (tab === 'daily') {
+    if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
+    system = _dailyLastSystem;
+    user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
+  } else {
+    const hairLine   = HAIR_DESC[hasbaraHair]   || HAIR_DESC['default'];
+    const outfitLine = OUTFIT_DESC[hasbaraOutfit] || 'natural and fitting';
+    const topic      = document.getElementById('has-topic').value.trim();
+    system = `You are a creative director generating ONE new Nano Banana image prompt for Mika.
 Mika: ${char} ${NECKLACE}
 Hair: ${hairLine} | Outfit: ${outfitLine}
-Pose style: ${hasModeInstruction}
 ${AUTHENTICITY}
-Generate 3 MORE fresh image variants — different poses/expressions/angles from previous ones. Same character, same energy, fresh takes.
-Return JSON: {"variants":[{"pose_note":"brief description","prompt":"full Nano Banana prompt","kling":"KLING3 animation prompt"},{"pose_note":"...","prompt":"...","kling":"..."},{"pose_note":"...","prompt":"...","kling":"..."}]}`;
-
-  const user = `Topic: ${topic || 'General Israeli pride/advocacy visual'}. Mood: ${MOOD_DESC[hasbaraMood]}. Setting: ${SETTING_DESC[hasbaraSetting]}.`;
+Return JSON only: {"pose_note":"brief description","prompt":"complete Nano Banana prompt","kling":"KLING3 animation 3-5 sec"}`;
+    user = `Topic: ${topic || 'Israeli pride/advocacy'}. Mood: ${MOOD_DESC[hasbaraMood]||'natural'}. Setting: ${SETTING_DESC[hasbaraSetting]||'neutral'}. Style: ${modeInstruction}. This is variant #${prevCount + 1} — make it different from previous ones.`;
+  }
 
   try {
-    const raw = await api(system, user, false);
+    const raw  = await api(system, user, false);
     const data = parseJSON(raw, false);
-    if (data.variants && Array.isArray(data.variants)) {
-      const startIdx = res.querySelectorAll('.card').length;
-      data.variants.forEach((v, i) => {
-        const card = makeCard('badge-coral', 'VARIANT ' + (startIdx + i + 1), v.pose_note || '', [
-          { label:'Nano Banana — Variant ' + (startIdx + i + 1), cls:'g', text: v.prompt },
-          { label:'KLING3 — Variant ' + (startIdx + i + 1), cls:'t', text: v.kling }
-        ], i * 0.09);
-        res.appendChild(card);
-      });
+    if (data && data.prompt) {
+      const styleLabel = mode === 'candid' ? '📸 CANDID' : '✦ NATURAL';
+      const badgeClass = tab === 'daily' ? 'badge' : 'badge-coral';
+      const card = makeCard(badgeClass, styleLabel, data.pose_note || '', [
+        { label: 'Nano Banana — Variant ' + (prevCount + 1), cls: 't', text: data.prompt },
+        { label: 'KLING3 — Variant ' + (prevCount + 1), cls: 'g', text: data.kling }
+      ], 0);
+      res.appendChild(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-  } catch(e) { res.insertAdjacentHTML('beforeend', errCard(e.message)); }
+  } catch(e) {
+    res.insertAdjacentHTML('beforeend', errCard(e.message));
+  }
 
-  btn.disabled = false; btn.textContent = '+ Load 3 more variants';
+  btns.querySelectorAll('button').forEach(b => { b.disabled = false; b.style.opacity = '1'; });
 }
 
 // ── SAME PLACE NEW POSES ─────────────────────────────────
