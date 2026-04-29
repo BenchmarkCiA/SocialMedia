@@ -149,6 +149,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;z-index:9999;border:1px solid var(--border2);white-space:nowrap;pointer-events:none;}
 
 .tab.t-sasha{color:var(--gold);border-bottom-color:var(--gold);}
+.tab.t-carousel{color:var(--teal);border-bottom-color:var(--teal);}
 .btn-gold{background:var(--gold);color:#0f0e0d;border:none;border-radius:var(--r);padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
 .btn-gold:hover{background:var(--gold2);}
 .btn-gold:disabled{opacity:.45;cursor:not-allowed;}
@@ -228,6 +229,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="tab" id="tab-extract" onclick="go('extract')">🖼 Prompt Extractor</div>
     <div class="tab" id="tab-hasbara" onclick="go('hasbara')">🔴 Image Studio</div>
     <div class="tab" id="tab-sasha" onclick="go('sasha')">⚡ SASHA</div>
+    <div class="tab" id="tab-carousel" onclick="go('carousel')">📋 Carousel</div>
   </div>
 
   <!-- ── DAILY PANEL ── -->
@@ -430,6 +432,66 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 
     <div class="hist-head"><span class="hist-title">Previous strategies</span><button class="hist-clear" onclick="clearHist('sasha')">Clear all</button></div>
     <div class="hist-list" id="sasha-hist"></div>
+  </div>
+
+  <!-- ── CAROUSEL PANEL ── -->
+  <div class="panel" id="panel-carousel">
+    <div class="p-title">Carousel</div>
+    <div class="p-desc">Generate 3-slide historical fact carousel posts for your advocacy account. Gold bar · Bold white text · Ready to paste into Canva.</div>
+
+    <div class="lbl">Today's suggested topics</div>
+    <div class="chips" id="car-chips" style="margin-bottom:18px;"></div>
+
+    <div style="margin-bottom:18px;">
+      <div class="lbl">Topic / override <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(or pick one above)</span></div>
+      <input class="field" type="text" id="car-topic" placeholder="e.g. Jewish presence in Jerusalem before Islam...">
+    </div>
+
+    <div class="row">
+      <button class="btn-teal" id="car-btn" onclick="runCarousel()"><span>✦</span> Generate Post</button>
+      <button class="btn-ghost" onclick="clearCarousel()">Clear</button>
+    </div>
+
+    <div class="loading" id="car-load"><div class="spin"></div><span>Generating your carousel post...</span></div>
+
+    <div id="car-results" style="display:none;margin-top:4px;">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><span class="badge badge-teal">SLIDE 1 — HOOK</span><span class="card-topic">Question for the audience</span></div>
+        <div class="card-body">
+          <div><div class="sec-label t">Slide text</div><div class="prompt-box" id="car-s1-text" style="font-size:15px;font-weight:600;"></div><button class="copy-btn" onclick="carCopy(this,'car-s1-text')">Copy</button></div>
+          <div style="margin-top:4px;"><div class="sec-label" style="color:var(--text3)">Canva note</div><div style="font-size:11px;color:var(--text3);line-height:1.6;">Mika thinking pose · Gold bar above · Montserrat Bold white · Dark gradient bottom</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><span class="badge badge-coral">SLIDE 2 — REVEAL</span><span class="card-topic">The historical fact</span></div>
+        <div class="card-body">
+          <div><div class="sec-label c">Slide text</div><div class="prompt-box" id="car-s2-text" style="font-size:15px;font-weight:600;"></div><button class="copy-btn" onclick="carCopy(this,'car-s2-text')">Copy</button></div>
+          <div style="margin-top:4px;"><div class="sec-label" style="color:var(--text3)">Canva note</div><div style="font-size:11px;color:var(--text3);line-height:1.6;">Mika arms-crossed pose · Same gold bar + gradient · Swap text only</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><span class="badge badge-gold">SLIDE 3 — CTA</span><span class="card-topic">Fixed call to action</span></div>
+        <div class="card-body">
+          <div><div class="sec-label g">Slide text</div><div class="prompt-box" id="car-s3-text" style="font-size:15px;font-weight:600;">Save this. Share it with someone who needs to know. 👇</div><button class="copy-btn" onclick="carCopy(this,'car-s3-text')">Copy</button></div>
+          <div style="margin-top:4px;"><div class="sec-label" style="color:var(--text3)">Canva note</div><div style="font-size:11px;color:var(--text3);line-height:1.6;">Mika beckoning pose · Same gold bar + gradient · CTA is always fixed</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:4px;">
+        <div class="card-head"><span class="badge badge-teal">CAPTION + HASHTAGS</span><span class="card-topic">Instagram post</span></div>
+        <div class="card-body">
+          <div><div class="sec-label t">Caption (EN)</div><div class="prompt-box" id="car-caption-text"></div><button class="copy-btn" onclick="carCopy(this,'car-caption-text')">Copy</button></div>
+          <div style="margin-top:8px;"><div class="sec-label">Hashtags</div><div class="prompt-box" id="car-hashtags-text" style="font-size:12px;color:var(--teal);"></div><button class="copy-btn" onclick="carCopy(this,'car-hashtags-text')">Copy</button></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn-ghost" style="font-size:12px;padding:8px 14px;" onclick="regenCarSlide(1)">↻ Regen hook</button>
+        <button class="btn-ghost" style="font-size:12px;padding:8px 14px;" onclick="regenCarSlide(2)">↻ Regen fact</button>
+        <button class="btn-ghost" style="font-size:12px;padding:8px 14px;border-color:var(--teal);color:var(--teal);" onclick="runCarousel()">↻ Full regenerate</button>
+      </div>
+    </div>
+
+    <div class="hist-head"><span class="hist-title">Previous carousels</span><button class="hist-clear" onclick="clearCarouselHist()">Clear all</button></div>
+    <div class="hist-list" id="car-hist"></div>
   </div>
 
 </div>
@@ -690,7 +752,7 @@ function mkChips(containerId, opts, defaultVal, activeClass, setter) {
 
 // ── TAB SWITCHING ────────────────────────────────────────
 function go(tab) {
-  ['daily','extract','hasbara','sasha'].forEach(t => {
+  ['daily','extract','hasbara','sasha','carousel'].forEach(t => {
     document.getElementById('panel-' + t).classList.toggle('active', t === tab);
     const el = document.getElementById('tab-' + t);
     el.className = 'tab' + (t === tab ? ' t-' + t : '');
@@ -1548,6 +1610,180 @@ Return JSON only:
 }
 
 renderAllHist();
+
+// ── CAROUSEL TAB ─────────────────────────────────────────
+let histCarousel = JSON.parse(localStorage.getItem('ms_hist_carousel') || '[]');
+let _carCurrentTopic = '';
+
+const CAR_TOPICS = [
+  'Jerusalem was built 1500 years before Islam',
+  'The Dead Sea Scrolls prove continuous Jewish presence in Israel',
+  'King David established Jerusalem as capital 3000 years ago',
+  'The word Palestine has Roman origins, not Arab',
+  'Jews have prayed facing Jerusalem for 3000 years',
+  'Hebron — the oldest continuously Jewish city in the world',
+  'The Temple Mount was built by King Solomon 3000 years ago',
+  'Jewish exile from Israel is documented in ancient Assyrian records',
+  'Masada — Jewish resistance against Rome 2000 years ago',
+  'The Balfour Declaration and the legal foundation of Israel',
+  'Israel declared independence in 1948 on land legally purchased',
+  'Jewish archaeological artifacts under Jerusalem predate Arab conquest by millennia',
+  'The Cyrus Declaration — the first recorded support for Jewish return to Israel',
+  'Arab leaders rejected the 1947 UN partition plan, Israel accepted it',
+  'Jews are indigenous to Canaan — confirmed by DNA and archaeology',
+  'The name Israel appears in Egyptian records from 1208 BCE',
+  'Jewish communities existed in Israel continuously for 3000 years',
+  'The Torah describes Jewish connection to Israel 3500 years ago',
+  'The Roman Emperor renamed Judea to Palestine to erase Jewish identity',
+  'Jews were the majority population in Jerusalem in the 1800s'
+];
+
+function carPickDailyTopics() {
+  const d = new Date().getDate();
+  const shuffled = [...CAR_TOPICS].sort((a,b) => ((a.charCodeAt(0)*d*3)%19) - ((b.charCodeAt(0)*d*3)%19));
+  return shuffled.slice(0, 5);
+}
+
+function buildCarChips() {
+  const el = document.getElementById('car-chips');
+  if (!el) return;
+  el.innerHTML = '';
+  carPickDailyTopics().forEach(t => {
+    const c = document.createElement('div');
+    c.className = 'chip';
+    c.textContent = t;
+    c.onclick = () => {
+      el.querySelectorAll('.chip').forEach(x => x.className = 'chip');
+      c.className = 'chip on-teal';
+      document.getElementById('car-topic').value = t;
+    };
+    el.appendChild(c);
+  });
+}
+
+async function runCarousel() {
+  if (!KEY) { alert('No API key'); return; }
+  const topic = document.getElementById('car-topic').value.trim();
+  if (!topic) { alert('Please enter or select a topic first.'); return; }
+  _carCurrentTopic = topic;
+  const btn = document.getElementById('car-btn');
+  const load = document.getElementById('car-load');
+  btn.disabled = true; load.classList.add('show');
+  document.getElementById('car-results').style.display = 'none';
+
+  const system = `You are creating Instagram carousel post content about Jewish and Israeli history for an advocacy account.
+The character is Mika — a confident Israeli woman. The tone is factual, sharp, and proud. Never apologetic.
+All facts must be historically accurate with specific dates and numbers.
+Return ONLY valid JSON, no preamble, no markdown fences.`;
+
+  const user = `Topic: "${topic}"
+
+Generate a 3-slide carousel post. Return this exact JSON structure:
+{
+  "hook": "A short provocative question max 10 words, ends with →",
+  "reveal": "The historical fact answer, max 20 words, includes specific dates or numbers in brackets like [3000 BCE]",
+  "caption": "Instagram caption 2-3 sentences, confident and factual, ends with a call to save/share",
+  "hashtags": "#Israel #Jewish #History #Jerusalem #Truth #IsraeliHistory #JewishHistory #HistoricalFacts #Archaeology #MiddleEast"
+}`;
+
+  try {
+    const raw = await api(system, user, false);
+    const data = parseJSON(raw, false);
+    document.getElementById('car-s1-text').textContent = data.hook || '';
+    document.getElementById('car-s2-text').textContent = data.reveal || '';
+    document.getElementById('car-caption-text').textContent = data.caption || '';
+    document.getElementById('car-hashtags-text').textContent = data.hashtags || '';
+    document.getElementById('car-results').style.display = 'block';
+    document.getElementById('car-results').scrollIntoView({ behavior:'smooth', block:'start' });
+
+    const entry = { date: now(), topic, hook: data.hook, reveal: data.reveal, caption: data.caption, hashtags: data.hashtags };
+    histCarousel.unshift(entry);
+    if (histCarousel.length > 20) histCarousel.pop();
+    localStorage.setItem('ms_hist_carousel', JSON.stringify(histCarousel));
+    renderCarouselHist();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+async function regenCarSlide(slide) {
+  if (!KEY || !_carCurrentTopic) return;
+  const field = slide === 1 ? 'hook' : 'reveal';
+  const elId = slide === 1 ? 'car-s1-text' : 'car-s2-text';
+  const el = document.getElementById(elId);
+  const prev = el.textContent;
+  el.textContent = 'Generating...';
+  el.style.opacity = '0.5';
+
+  const system = `You are creating Instagram carousel content about Jewish and Israeli history. Return ONLY valid JSON, no preamble.`;
+  const user = slide === 1
+    ? `Topic: "${_carCurrentTopic}"\nGenerate a new short provocative question (max 10 words, ends with →). Must be different from: "${prev}"\nReturn: {"hook":"..."}`
+    : `Topic: "${_carCurrentTopic}"\nGenerate a new historical fact answer (max 20 words, includes dates/numbers in brackets). Must be different from: "${prev}"\nReturn: {"reveal":"..."}`;
+
+  try {
+    const raw = await api(system, user, false);
+    const data = parseJSON(raw, false);
+    el.textContent = data[field] || prev;
+  } catch(e) {
+    el.textContent = prev;
+  }
+  el.style.opacity = '1';
+}
+
+function carCopy(btn, elId) {
+  const text = document.getElementById(elId)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied ✓'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1800);
+  });
+}
+
+function clearCarousel() {
+  document.getElementById('car-topic').value = '';
+  document.getElementById('car-results').style.display = 'none';
+  document.getElementById('car-s1-text').textContent = '';
+  document.getElementById('car-s2-text').textContent = '';
+  document.getElementById('car-caption-text').textContent = '';
+  document.getElementById('car-hashtags-text').textContent = '';
+  document.getElementById('car-chips').querySelectorAll('.chip').forEach(c => c.className = 'chip');
+  _carCurrentTopic = '';
+}
+
+function clearCarouselHist() {
+  histCarousel = [];
+  localStorage.removeItem('ms_hist_carousel');
+  renderCarouselHist();
+}
+
+function renderCarouselHist() {
+  const el = document.getElementById('car-hist');
+  if (!el) return;
+  if (!histCarousel.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:6px 0">Nothing yet.</div>'; return; }
+  el.innerHTML = histCarousel.map((h, i) => `
+    <div class="hist-item" onclick="loadCarouselHist(${i})">
+      <div class="hist-date">${h.date || ''}</div>
+      <div class="hist-row">
+        <span class="hist-label">${escH(h.topic || 'Carousel')}</span>
+        <span class="hist-load" style="color:var(--teal)">↺ Load</span>
+      </div>
+    </div>`).join('');
+}
+
+function loadCarouselHist(i) {
+  const h = histCarousel[i]; if (!h) return;
+  document.getElementById('car-topic').value = h.topic || '';
+  _carCurrentTopic = h.topic || '';
+  document.getElementById('car-s1-text').textContent = h.hook || '';
+  document.getElementById('car-s2-text').textContent = h.reveal || '';
+  document.getElementById('car-caption-text').textContent = h.caption || '';
+  document.getElementById('car-hashtags-text').textContent = h.hashtags || '';
+  document.getElementById('car-results').style.display = 'block';
+  document.getElementById('car-results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+renderCarouselHist();
+buildCarChips();
 </script>
 </body>
 </html>
