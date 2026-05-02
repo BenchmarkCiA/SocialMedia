@@ -128,8 +128,6 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .hist-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
 .hist-clear{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .hist-clear:hover{color:var(--coral);}
-.hist-toggle{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;padding:3px 10px;transition:all .2s;}
-.hist-toggle:hover{border-color:var(--border2);color:var(--text2);}
 .hist-list{display:flex;flex-direction:column;gap:5px;}
 .hist-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;}
 .hist-item:hover{border-color:var(--border2);color:var(--text);}
@@ -275,6 +273,11 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       <input class="field" type="text" id="outdoor-note" placeholder="e.g. hiking in the Galil, walking near Jaffa port, rooftop in Tel Aviv...">
     </div>
 
+    <div style="margin-bottom:18px;">
+      <div class="lbl">Describe the scene <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — leave blank to use selections above)</span></div>
+      <textarea class="field" id="daily-free-prompt" rows="2" placeholder="e.g. she is drinking coffee in her living room&#10;e.g. just woke up, stretching in bed&#10;e.g. cooking pasta in the kitchen, apron on"></textarea>
+    </div>
+
     <div class="row">
       <button class="btn-teal" id="daily-btn" onclick="runDaily()"><span>✦</span> Generate Prompts</button>
       <button class="btn-ghost" onclick="clearR('daily')">Clear</button>
@@ -285,14 +288,8 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('daily','natural')">+ Add natural pose</button>
       <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('daily','candid')">+ Add candid pose</button>
     </div>
-    <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('daily')">
-      <span class="hist-title">Saved prompts</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button class="hist-toggle" id="daily-hist-btn" onclick="event.stopPropagation();toggleHist('daily')">Expand</button>
-        <button class="hist-clear" onclick="event.stopPropagation();clearHist('daily')">Clear all</button>
-      </div>
-    </div>
-    <div class="hist-list" id="daily-hist" style="display:none;margin-top:8px;"></div>
+    <div class="hist-head"><span class="hist-title">Saved prompts</span><button class="hist-clear" onclick="clearHist('daily')">Clear all</button></div>
+    <div class="hist-list" id="daily-hist"></div>
   </div>
 
   <!-- ── EXTRACT PANEL ── -->
@@ -316,12 +313,6 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       </div>
     </div>
 
-    <div class="lbl">Prompt style</div>
-    <div class="mode-toggle" id="extract-mode-toggle">
-      <button class="mode-btn active" onclick="setMode('extract','natural',this)">✦ Natural</button>
-      <button class="mode-btn" onclick="setMode('extract','candid',this)">📸 Candid / Creative</button>
-    </div>
-
     <div class="lbl">Hair</div>
     <div class="chips" id="extract-hair"></div>
     <div class="lbl">Outfit <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — auto from image)</span></div>
@@ -333,14 +324,9 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="extract-load"><div class="spin"></div><span id="extract-load-txt">Analyzing image...</span></div>
     <div class="cards" id="extract-results"></div>
+    <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
+    <div class="hist-list" id="extract-hist"></div>
 
-    <!-- Add more variants buttons — shown after generation -->
-    <div id="extract-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('extract','natural')">+ Add natural pose</button>
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('extract','candid')">+ Add candid pose</button>
-    </div>
-
-    <!-- Same Place New Poses -->
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
       <div class="p-title" style="font-size:20px;margin-bottom:4px;">Same Place, New Poses</div>
       <div class="p-desc">Upload an existing image of Mika — get 3 more pose variants in the exact same location and setting.</div>
@@ -370,18 +356,6 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       </div>
       <div class="loading" id="poses-load"><div class="spin"></div><span>Analyzing location and generating poses...</span></div>
       <div class="cards" id="poses-results"></div>
-    </div>
-
-    <!-- Previous extractions — collapsible, at bottom -->
-    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
-      <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('extract')">
-        <span class="hist-title">Previous extractions</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="hist-toggle" id="extract-hist-btn" onclick="event.stopPropagation();toggleHist('extract')">Expand</button>
-          <button class="hist-clear" onclick="event.stopPropagation();clearHist('extract')">Clear all</button>
-        </div>
-      </div>
-      <div class="hist-list" id="extract-hist" style="display:none;margin-top:8px;"></div>
     </div>
 
   </div>
@@ -423,14 +397,8 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('hasbara','natural')">+ Add natural pose</button>
       <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('hasbara','candid')">+ Add candid pose</button>
     </div>
-    <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('hasbara')">
-      <span class="hist-title">Previous generations</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button class="hist-toggle" id="hasbara-hist-btn" onclick="event.stopPropagation();toggleHist('hasbara')">Expand</button>
-        <button class="hist-clear" onclick="event.stopPropagation();clearHist('hasbara')">Clear all</button>
-      </div>
-    </div>
-    <div class="hist-list" id="has-hist" style="display:none;margin-top:8px;"></div>
+    <div class="hist-head"><span class="hist-title">Previous generations</span><button class="hist-clear" onclick="clearHist('hasbara')">Clear all</button></div>
+    <div class="hist-list" id="has-hist"></div>
   </div>
 
 
@@ -467,14 +435,8 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 
     <div id="sasha-results"></div>
 
-    <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('sasha')">
-      <span class="hist-title">Previous strategies</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button class="hist-toggle" id="sasha-hist-btn" onclick="event.stopPropagation();toggleHist('sasha')">Expand</button>
-        <button class="hist-clear" onclick="event.stopPropagation();clearHist('sasha')">Clear all</button>
-      </div>
-    </div>
-    <div class="hist-list" id="sasha-hist" style="display:none;margin-top:8px;"></div>
+    <div class="hist-head"><span class="hist-title">Previous strategies</span><button class="hist-clear" onclick="clearHist('sasha')">Clear all</button></div>
+    <div class="hist-list" id="sasha-hist"></div>
   </div>
 
   <!-- ── CAROUSEL PANEL ── -->
@@ -533,14 +495,8 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       </div>
     </div>
 
-    <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('carousel')">
-      <span class="hist-title">Previous carousels</span>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button class="hist-toggle" id="carousel-hist-btn" onclick="event.stopPropagation();toggleHist('carousel')">Expand</button>
-        <button class="hist-clear" onclick="event.stopPropagation();clearCarouselHist()">Clear all</button>
-      </div>
-    </div>
-    <div class="hist-list" id="car-hist" style="display:none;margin-top:8px;"></div>
+    <div class="hist-head"><span class="hist-title">Previous carousels</span><button class="hist-clear" onclick="clearCarouselHist()">Clear all</button></div>
+    <div class="hist-list" id="car-hist"></div>
   </div>
 
 </div>
@@ -583,8 +539,6 @@ let dailyScene = 'bedroom';
 let dailyMode = 'natural';
 let hasbaraMode = 'natural';
 let extractMode = 'natural';
-let _extractLastSystem = '';
-let _extractLastOutfit = '';
 let _dailyLastSystem = '';
 let _dailyLastScene = '';
 let _dailyLastOutfit = '';
@@ -939,6 +893,7 @@ async function runDaily() {
   const scene = dailyScene;
   const homeRooms = { bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'), salon: getRoom('salon'), bathroom: getRoom('bathroom') };
   const outdoorNote = document.getElementById('outdoor-note')?.value.trim() || '';
+  const freePrompt = document.getElementById('daily-free-prompt')?.value.trim() || '';
   const sceneDesc = {
     'bedroom': homeRooms.bedroom, 'kitchen': homeRooms.kitchen,
     'salon': homeRooms.salon, 'bathroom': homeRooms.bathroom,
@@ -963,13 +918,17 @@ async function runDaily() {
     : 'Mood/Expression: natural and relaxed — no specific mood, keep it candid';
   const klingLine = KLING_DESC[dailyKling] || KLING_DESC['5s'];
 
+  const freePromptLine = freePrompt
+    ? `USER SCENE DESCRIPTION (use this as the creative brief — build everything around it): "${freePrompt}"`
+    : '';
+
   const system = `You are a creative director generating Nano Banana image prompts for Mika's Instagram lifestyle account.
 Mika's appearance: ${char}
 Hair: ${hairLine}
 Outfit: ${outfitLine}
 ${NECKLACE}
 Scene/location: ${locationDesc}
-${modeInstruction}
+${freePromptLine ? freePromptLine + '\n' : ''}${modeInstruction}
 ${moodLine}
 ${AUTHENTICITY}
 Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
@@ -1046,7 +1005,6 @@ async function runExtract() {
   const outfitOverride = OUTFIT_DESC[extractOutfit];
   const homeRooms = { bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'), salon: getRoom('salon'), bathroom: getRoom('bathroom') };
 
-  const extractModeInstruction = MODE_DESC[extractMode] || MODE_DESC.natural;
   const system = `You are a creative director analyzing reference images to generate Nano Banana AI image prompts for a character named Mika.
 Mika's appearance (ALWAYS use — never describe the uploaded person): ${char}
 ${NECKLACE}
@@ -1061,8 +1019,6 @@ RULES: 1) Analyze image for pose, expression, outfit, setting, lighting, angle, 
 Return JSON only:
 {"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","kling_main":"KLING3 animation for main shot","variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual caption"}`;
 
-  _extractLastSystem = system;
-  _extractLastOutfit = outfitOverride || 'outfit from image';
   try {
     const raw = await apiWithImage(system, 'Analyze this image and generate the full prompt set for Mika.', imgB64, imgType);
     const data = parseJSON(raw, false);
@@ -1071,7 +1027,6 @@ Return JSON only:
     localStorage.setItem('ms_hist_extract', JSON.stringify(histExtract));
     renderExtractData(res, data);
     renderAllHist();
-    document.getElementById('extract-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1192,8 +1147,6 @@ function renderAllHist() {
 function renderHist(elId, arr, color, onClick, labelFn) {
   const el = document.getElementById(elId);
   if (!el) return;
-  // preserve current display state
-  const currentDisplay = el.style.display;
   if (!arr.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:6px 0">Nothing yet.</div>'; return; }
   el.innerHTML = arr.map((h, i) => `
     <div class="hist-item" onclick="(${onClick.toString()})(${i})">
@@ -1218,17 +1171,6 @@ const MODE_DESC = {
   natural: 'Natural, relaxed poses — standing, sitting, looking at camera or slightly away. Clean and polished but authentic.',
   candid: 'Caught in a real moment — mid-laugh, fixing hair, lying on sofa scrolling phone, leaning against a wall looking away, sitting on a counter, glancing out a window. Feels like a real person caught naturally, NOT a posed model shoot. The viewer should feel like they caught a private moment.'
 };
-
-function toggleHist(tab) {
-  const listId = {daily:'daily-hist', extract:'extract-hist', hasbara:'has-hist', sasha:'sasha-hist', carousel:'car-hist'}[tab];
-  const btnId  = tab + '-hist-btn';
-  const list = document.getElementById(listId);
-  const btn  = document.getElementById(btnId);
-  if (!list) return;
-  const isHidden = list.style.display === 'none' || list.style.display === '';
-  list.style.display = isHidden ? 'flex' : 'none';
-  if (btn) btn.textContent = isHidden ? 'Collapse' : 'Expand';
-}
 
 function setMode(tab, mode, btn) {
   const toggleId = tab === 'daily' ? 'daily-mode-toggle' : tab === 'hasbara' ? 'has-mode-toggle' : null;
@@ -1535,8 +1477,8 @@ function renderSasha(container, ideas) {
 // ── ADD ONE VARIANT ──────────────────────────────────────
 async function addOneVariant(tab, mode) {
   if (!KEY) return;
-  const btnsId = tab === 'daily' ? 'daily-add-btns' : tab === 'extract' ? 'extract-add-btns' : 'has-add-btns';
-  const resId  = tab === 'daily' ? 'daily-results'  : tab === 'extract' ? 'extract-results'  : 'has-results';
+  const btnsId = tab === 'daily' ? 'daily-add-btns' : 'has-add-btns';
+  const resId  = tab === 'daily' ? 'daily-results'  : 'has-results';
   const btns   = document.getElementById(btnsId);
   const res    = document.getElementById(resId);
   const prevCount = res.querySelectorAll('.card').length;
@@ -1549,11 +1491,7 @@ async function addOneVariant(tab, mode) {
 
   let system, user;
 
-  if (tab === 'extract') {
-    if (!_extractLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
-    system = _extractLastSystem;
-    user = `Generate ONE more single image variant using the SAME extracted scene and background. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the previous variants: ${_extractLastOutfit}. Only the pose/expression changes. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
-  } else if (tab === 'daily') {
+  if (tab === 'daily') {
     if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
     system = _dailyLastSystem;
     user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the previous variants: ${_dailyLastOutfit || outfitLine}. Only the pose changes. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt — must include the exact same outfit described","kling":"KLING3 prompt"}`;
