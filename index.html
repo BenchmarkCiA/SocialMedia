@@ -320,10 +320,17 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="loading" id="extract-load"><div class="spin"></div><span id="extract-load-txt">Analyzing image...</span></div>
     <div class="cards" id="extract-results"></div>
 
-    <!-- ── SAME PLACE NEW POSES — above history ── -->
+    <div id="extract-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('extract','natural')">+ Add natural pose</button>
+      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('extract','candid')">+ Add candid pose</button>
+    </div>
+
+    <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
+    <div class="hist-list" id="extract-hist"></div>
+
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
       <div class="p-title" style="font-size:20px;margin-bottom:4px;">Same Place, New Poses</div>
-      <div class="p-desc">Upload an existing image of Mika — get 3 pose variants in the exact same location. Then add more natural or candid poses on demand.</div>
+      <div class="p-desc">Upload an existing image of Mika — get 3 more pose variants in the exact same location and setting.</div>
 
       <div class="upload-box" id="poses-upload-box">
         <p>Upload an existing Mika image</p>
@@ -345,29 +352,11 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
       <div class="chips" id="poses-hair"></div>
 
       <div class="row">
-        <button class="btn-teal" id="poses-btn" onclick="runPoses()" disabled><span>🔄</span> Generate Poses</button>
+        <button class="btn-teal" id="poses-btn" onclick="runPoses()" disabled><span>🔄</span> Generate 3 New Poses</button>
         <button class="btn-ghost" onclick="clearPoses()">Clear</button>
       </div>
       <div class="loading" id="poses-load"><div class="spin"></div><span>Analyzing location and generating poses...</span></div>
       <div class="cards" id="poses-results"></div>
-
-      <!-- Add more poses buttons — shown after generation -->
-      <div id="poses-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
-        <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('poses','natural')">+ Add natural pose</button>
-        <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('poses','candid')">+ Add candid pose</button>
-      </div>
-    </div>
-
-    <!-- ── PREVIOUS EXTRACTIONS — collapsible, at bottom ── -->
-    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
-      <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('extract')">
-        <span class="hist-title">Previous extractions</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="hist-toggle" id="extract-hist-btn" onclick="event.stopPropagation();toggleHist('extract')">Expand</button>
-          <button class="hist-clear" onclick="event.stopPropagation();clearHist('extract')">Clear all</button>
-        </div>
-      </div>
-      <div class="hist-list" id="extract-hist" style="display:none;margin-top:8px;"></div>
     </div>
 
   </div>
@@ -562,8 +551,6 @@ let dailyKling = '5s';
 let extractHair = 'default';
 let extractOutfit = 'auto';
 let posesImgB64 = null;
-let _posesLastSystem = '';
-let _posesLastOutfit = '';
 let posesImgType = 'image/jpeg';
 let posesHair = 'default';
 let hasbaraMood = 'thinking';
@@ -572,6 +559,8 @@ let hasbaraHair = 'default';
 let hasbaraOutfit = 'auto';
 let hasbaraTone = 'cynical';
 let imgB64 = null;
+let _extractLastSystem = '';
+let _extractLastOutfit = '';
 let imgType = 'image/jpeg';
 
 let sashaFocus = 'both';
@@ -1022,12 +1011,14 @@ ${outfitOverride ? 'Outfit override: ' + outfitOverride : 'Outfit: extract from 
 Home room library (use EXACTLY when scene matches — do NOT copy background from the photo):
 - Bedroom: ${homeRooms.bedroom}
 - Kitchen: ${homeRooms.kitchen}
-- Living room: ${homeRooms.livingroom || homeRooms.salon}
+- Living room: ${homeRooms.salon}
 - Bathroom: ${homeRooms.bathroom}
 RULES: 1) Analyze image for pose, expression, outfit, setting, lighting, angle, mood. 2) For background: if bedroom/kitchen/living room/bathroom → use saved description exactly. Otherwise describe faithfully from the photo. 3) Replace the person entirely with Mika — same pose, same energy, same scene. 4) ${AUTHENTICITY} 5) Generate 1 main + 3 pose variants in same location.
 Return JSON only:
 {"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","kling_main":"KLING3 animation for main shot","variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual caption"}`;
 
+  _extractLastSystem = system;
+  _extractLastOutfit = outfitOverride || 'outfit from image — keep exactly the same';
   try {
     const raw = await apiWithImage(system, 'Analyze this image and generate the full prompt set for Mika.', imgB64, imgType);
     const data = parseJSON(raw, false);
@@ -1036,6 +1027,7 @@ Return JSON only:
     localStorage.setItem('ms_hist_extract', JSON.stringify(histExtract));
     renderExtractData(res, data);
     renderAllHist();
+    document.getElementById('extract-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1180,18 +1172,6 @@ const MODE_DESC = {
   natural: 'Natural, relaxed poses — standing, sitting, looking at camera or slightly away. Clean and polished but authentic.',
   candid: 'Caught in a real moment — mid-laugh, fixing hair, lying on sofa scrolling phone, leaning against a wall looking away, sitting on a counter, glancing out a window. Feels like a real person caught naturally, NOT a posed model shoot. The viewer should feel like they caught a private moment.'
 };
-
-function toggleHist(tab) {
-  const ids = {daily:'daily-hist', extract:'extract-hist', hasbara:'has-hist', sasha:'sasha-hist', carousel:'car-hist'};
-  const listId = ids[tab];
-  const btnId  = tab + '-hist-btn';
-  const list = document.getElementById(listId);
-  const btn  = document.getElementById(btnId);
-  if (!list) return;
-  const isHidden = list.style.display === 'none' || list.style.display === '';
-  list.style.display = isHidden ? 'flex' : 'none';
-  if (btn) btn.textContent = isHidden ? 'Collapse' : 'Expand';
-}
 
 function setMode(tab, mode, btn) {
   const toggleId = tab === 'daily' ? 'daily-mode-toggle' : tab === 'hasbara' ? 'has-mode-toggle' : null;
@@ -1498,8 +1478,8 @@ function renderSasha(container, ideas) {
 // ── ADD ONE VARIANT ──────────────────────────────────────
 async function addOneVariant(tab, mode) {
   if (!KEY) return;
-  const btnsId = tab === 'daily' ? 'daily-add-btns' : tab === 'poses' ? 'poses-add-btns' : tab === 'extract' ? 'extract-add-btns' : 'has-add-btns';
-  const resId  = tab === 'daily' ? 'daily-results'  : tab === 'poses' ? 'poses-results'  : tab === 'extract' ? 'extract-results'  : 'has-results';
+  const btnsId = tab === 'daily' ? 'daily-add-btns' : tab === 'extract' ? 'extract-add-btns' : tab === 'poses' ? 'poses-add-btns' : 'has-add-btns';
+  const resId  = tab === 'daily' ? 'daily-results'  : tab === 'extract' ? 'extract-results'  : tab === 'poses' ? 'poses-results'  : 'has-results';
   const btns   = document.getElementById(btnsId);
   const res    = document.getElementById(resId);
   const prevCount = res.querySelectorAll('.card').length;
@@ -1512,10 +1492,10 @@ async function addOneVariant(tab, mode) {
 
   let system, user;
 
-  if (tab === 'poses') {
-    if (!_posesLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
-    system = _posesLastSystem;
-    user = `Generate ONE more pose variant in the EXACT SAME location and background. Style: ${modeInstruction}. Mika wears the EXACT SAME outfit as before. Only pose/expression changes. Different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
+  if (tab === 'extract') {
+    if (!_extractLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
+    system = _extractLastSystem;
+    user = `Generate ONE more image variant using the SAME extracted scene and background. Style: ${modeInstruction}. Mika wears the EXACT SAME outfit: ${_extractLastOutfit}. Only pose/expression changes. Different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
   } else if (tab === 'daily') {
     if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
     system = _dailyLastSystem;
@@ -1588,7 +1568,7 @@ async function runPoses() {
   const hairLine = HAIR_DESC[posesHair] || HAIR_DESC['default'];
   const homeRooms = {
     bedroom: getRoom('bedroom'), kitchen: getRoom('kitchen'),
-    livingroom: getRoom('livingroom') || getRoom('salon'), bathroom: getRoom('bathroom')
+    salon: getRoom('salon'), bathroom: getRoom('bathroom')
   };
 
   const system = `You are a creative director generating Nano Banana image prompt variants for an AI character named Mika.
@@ -1606,7 +1586,7 @@ ${AUTHENTICITY}
 Saved home rooms (use EXACTLY if scene matches):
 - Bedroom: ${homeRooms.bedroom}
 - Kitchen: ${homeRooms.kitchen}
-- Living room: ${homeRooms.livingroom || homeRooms.salon}
+- Living room: ${homeRooms.salon}
 - Bathroom: ${homeRooms.bathroom}
 
 Return JSON only:
@@ -1620,8 +1600,6 @@ Return JSON only:
   ]
 }`;
 
-  _posesLastSystem = system;
-  _posesLastOutfit = 'outfit from image — keep exactly the same';
   try {
     const raw = await apiWithImage(system, 'Analyze this image and generate 3 new pose variants for Mika in the exact same location.', posesImgB64, posesImgType);
     const data = parseJSON(raw, false);
@@ -1639,8 +1617,6 @@ Return JSON only:
         { label: 'KLING3 — Pose ' + (i+1), cls: 'g', text: v.kling }
       ], (i+1) * 0.09));
     });
-
-    document.getElementById('poses-add-btns').style.display = 'flex';
 
   } catch(e) {
     res.innerHTML = errCard(e.message);
