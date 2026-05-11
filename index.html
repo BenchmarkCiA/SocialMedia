@@ -319,12 +319,6 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="extract-load"><div class="spin"></div><span id="extract-load-txt">Analyzing image...</span></div>
     <div class="cards" id="extract-results"></div>
-
-    <div id="extract-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('extract','natural')">+ Add natural pose</button>
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('extract','candid')">+ Add candid pose</button>
-    </div>
-
     <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
     <div class="hist-list" id="extract-hist"></div>
 
@@ -559,8 +553,6 @@ let hasbaraHair = 'default';
 let hasbaraOutfit = 'auto';
 let hasbaraTone = 'cynical';
 let imgB64 = null;
-let _extractLastSystem = '';
-let _extractLastOutfit = '';
 let imgType = 'image/jpeg';
 
 let sashaFocus = 'both';
@@ -931,7 +923,7 @@ ${moodLine}
 ${AUTHENTICITY}
 Generate ONE main prompt + 3 pose variants. All 4 images shot at the same location at the same time — only Mika's pose/expression changes. Background wording must be nearly identical across all 4 prompts.
 Return JSON only:
-{"scene_summary":"one line","main_prompt":"full prompt","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full prompt — Mika wears IDENTICAL outfit to main prompt","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
+{"scene_summary":"one line","main_prompt":"full image prompt — start directly with subject, never with Nano Banana or any tool name","kling_main":"${klingLine}","variants":[{"pose_note":"brief","prompt":"full image prompt — never starts with Nano Banana, Mika wears IDENTICAL outfit to main","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full image prompt — never starts with Nano Banana, identical outfit","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full image prompt — never starts with Nano Banana, identical outfit","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual English caption"}`;
 
   try {
     _dailyLastSystem = system;
@@ -1014,11 +1006,10 @@ Home room library (use EXACTLY when scene matches — do NOT copy background fro
 - Living room: ${homeRooms.salon}
 - Bathroom: ${homeRooms.bathroom}
 RULES: 1) Analyze image for pose, expression, outfit, setting, lighting, angle, mood. 2) For background: if bedroom/kitchen/living room/bathroom → use saved description exactly. Otherwise describe faithfully from the photo. 3) Replace the person entirely with Mika — same pose, same energy, same scene. 4) ${AUTHENTICITY} 5) Generate 1 main + 3 pose variants in same location.
+OUTPUT RULE: Never begin any prompt field with the words Nano Banana or any tool name. Prompts must start directly with the subject description.
 Return JSON only:
-{"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"brief description","main_prompt":"full prompt","kling_main":"KLING3 animation for main shot","variants":[{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual caption"}`;
+{"scene_detected":"one line","background_source":"library or extracted","pose_extracted":"detailed pose description","main_prompt":"full image prompt — start with subject description, NEVER with the words Nano Banana or any tool name","kling_main":"KLING3 animation for main shot","variants":[{"pose_note":"brief","prompt":"full image prompt — NEVER starts with Nano Banana","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full image prompt — NEVER starts with Nano Banana","kling":"KLING3 prompt for this variant"},{"pose_note":"brief","prompt":"full image prompt — NEVER starts with Nano Banana","kling":"KLING3 prompt for this variant"}],"caption_idea":"casual caption"}`;
 
-  _extractLastSystem = system;
-  _extractLastOutfit = outfitOverride || 'outfit from image — keep exactly the same';
   try {
     const raw = await apiWithImage(system, 'Analyze this image and generate the full prompt set for Mika.', imgB64, imgType);
     const data = parseJSON(raw, false);
@@ -1027,7 +1018,6 @@ Return JSON only:
     localStorage.setItem('ms_hist_extract', JSON.stringify(histExtract));
     renderExtractData(res, data);
     renderAllHist();
-    document.getElementById('extract-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1078,7 +1068,7 @@ Outfit: ${outfitLine}
 Pose style: ${hasModeInstruction}
 ${AUTHENTICITY}
 Generate ONE complete image prompt set. Return JSON only:
-{"nano_prompt":"full Nano Banana prompt including appearance, hair, outfit, necklace, expression, setting, authenticity","kling_prompt":"KLING3 2-3 sec subtle natural movement matching the mood","caption_en":"sharp punchy English caption${lang==='hebrew'?' (optional)':' (required)'}","caption_he":"Hebrew caption${lang==='english'?' (optional)':' (required)'}","post_idea":"one sentence: ideal use case for this image"}`;
+{"nano_prompt":"full image prompt — start directly with the subject description, NEVER start with the words Nano Banana or any tool name. Include: appearance, hair, outfit, necklace, expression, setting, authenticity","kling_prompt":"KLING3 2-3 sec subtle natural movement matching the mood","caption_en":"sharp punchy English caption${lang==='hebrew'?' (optional)':' (required)'}","caption_he":"Hebrew caption${lang==='english'?' (optional)':' (required)'}","post_idea":"one sentence: ideal use case for this image"}`;
 
   const user = `${topicLine}
 Mood/Expression: ${MOOD_DESC[hasbaraMood] || MOOD_DESC.thinking}
@@ -1478,8 +1468,8 @@ function renderSasha(container, ideas) {
 // ── ADD ONE VARIANT ──────────────────────────────────────
 async function addOneVariant(tab, mode) {
   if (!KEY) return;
-  const btnsId = tab === 'daily' ? 'daily-add-btns' : tab === 'extract' ? 'extract-add-btns' : tab === 'poses' ? 'poses-add-btns' : 'has-add-btns';
-  const resId  = tab === 'daily' ? 'daily-results'  : tab === 'extract' ? 'extract-results'  : tab === 'poses' ? 'poses-results'  : 'has-results';
+  const btnsId = tab === 'daily' ? 'daily-add-btns' : 'has-add-btns';
+  const resId  = tab === 'daily' ? 'daily-results'  : 'has-results';
   const btns   = document.getElementById(btnsId);
   const res    = document.getElementById(resId);
   const prevCount = res.querySelectorAll('.card').length;
@@ -1492,11 +1482,7 @@ async function addOneVariant(tab, mode) {
 
   let system, user;
 
-  if (tab === 'extract') {
-    if (!_extractLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
-    system = _extractLastSystem;
-    user = `Generate ONE more image variant using the SAME extracted scene and background. Style: ${modeInstruction}. Mika wears the EXACT SAME outfit: ${_extractLastOutfit}. Only pose/expression changes. Different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt","kling":"KLING3 prompt"}`;
-  } else if (tab === 'daily') {
+  if (tab === 'daily') {
     if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
     system = _dailyLastSystem;
     user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the previous variants: ${_dailyLastOutfit || outfitLine}. Only the pose changes. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt — must include the exact same outfit described","kling":"KLING3 prompt"}`;
@@ -1594,7 +1580,7 @@ Return JSON only:
   "location_detected": "one line description of the detected location",
   "background_locked": "full detailed background description that will be copy-pasted into all 3 prompts",
   "variants": [
-    {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt with Mika appearance + hair + necklace + this pose + background_locked + authenticity", "kling": "KLING3 animation prompt for this pose"},
+    {"pose_note": "brief pose description", "prompt": "complete image prompt — NEVER start with Nano Banana. Include Mika appearance + hair + necklace + this pose + background_locked + authenticity", "kling": "KLING3 animation prompt for this pose"},
     {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt", "kling": "KLING3 animation prompt for this pose"},
     {"pose_note": "brief pose description", "prompt": "complete Nano Banana prompt", "kling": "KLING3 animation prompt for this pose"}
   ]
