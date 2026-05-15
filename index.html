@@ -118,6 +118,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .upload-box small{color:var(--text3);font-size:11px;display:block;margin-top:10px;}
 .file-input-wrap{display:inline-block;}
 .file-input-wrap input[type=file]{font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;width:100%;}
+.file-input-wrap input[type=file]::file-selector-button{min-height:36px;}
 .file-input-wrap input[type=file]::file-selector-button{background:var(--gold);color:#0f0e0d;border:none;border-radius:8px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-right:12px;}
 .preview-img{max-width:100%;max-height:260px;border-radius:var(--r);border:1px solid var(--border);object-fit:contain;display:block;margin-bottom:10px;}
 .preview-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
@@ -149,6 +150,19 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--text);padding:9px 18px;border-radius:8px;font-size:12px;z-index:9999;border:1px solid var(--border2);white-space:nowrap;pointer-events:none;}
 
 .tab.t-sasha{color:var(--gold);border-bottom-color:var(--gold);}
+.tab.t-video{color:#a78bfa;border-bottom-color:#a78bfa;}
+.video-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;animation:fadeUp .35s ease forwards;opacity:0;margin-bottom:12px;}
+.video-card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.video-type-badge{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.vt-ambient{background:rgba(74,184,160,.15);color:var(--teal);}
+.vt-reaction{background:rgba(232,105,74,.15);color:var(--coral);}
+.vt-transition{background:rgba(167,139,250,.15);color:#a78bfa;}
+.vt-wildcard{background:rgba(212,168,71,.15);color:var(--gold);}
+.video-card-body{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.dur-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--surface);color:var(--text2);}
+.img-prompt-area{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:12px;color:var(--text2);line-height:1.6;font-style:italic;}
+.transition-box{background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:12px 14px;margin-top:2px;}
+.transition-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a78bfa;margin-bottom:6px;}
 .tab.t-carousel{color:var(--teal);border-bottom-color:var(--teal);}
 .btn-gold{background:var(--gold);color:#0f0e0d;border:none;border-radius:var(--r);padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
 .btn-gold:hover{background:var(--gold2);}
@@ -184,17 +198,94 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 
 /* MOBILE */
 @media(max-width:600px){
-  .panel{padding:16px 12px;}
-  .topbar{padding:11px 14px;}
-  .tabs{padding:12px 12px 0;}
-  .tab{padding:9px 12px;font-size:12px;}
-  .p-title{font-size:21px;}
-  .scenes{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));}
-  .card-body{padding:13px;}
-  .prompt-box{font-size:11px;}
-  .modal{padding:20px 16px;}
-  .setup-card{padding:22px 16px;}
-  .logo{font-size:34px;}
+  /* Layout */
+  .panel{padding:14px 12px;}
+  .topbar{padding:10px 13px;}
+  .topbar-logo{font-size:17px;}
+  .gear-btn{padding:5px 10px;font-size:11px;}
+
+  /* Tabs — scroll horizontally */
+  .tabs{padding:10px 12px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{padding:8px 11px;font-size:11px;white-space:nowrap;flex-shrink:0;}
+
+  /* Typography */
+  .p-title{font-size:20px;}
+  .p-desc{font-size:11px;}
+  .lbl{font-size:9px;}
+
+  /* Setup screen */
+  .logo{font-size:28px;}
+  .sub{font-size:12px;}
+  .setup-card{padding:20px 14px;}
+
+  /* Chips — wrap tightly */
+  .chips{gap:5px;}
+  .chip{padding:5px 10px;font-size:11px;}
+  .mode-toggle{width:100%;}
+  .mode-btn{flex:1;padding:7px 8px;font-size:11px;}
+
+  /* Scene grid */
+  .scenes{grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:5px;}
+  .scene{padding:8px 6px;}
+  .scene-icon{font-size:17px;}
+  .scene-name{font-size:10px;}
+
+  /* Buttons */
+  .row{gap:7px;}
+  .btn-coral,.btn-teal,.btn-ghost{padding:10px 14px;font-size:12px;}
+  .btn-gold{padding:10px 14px;font-size:12px;}
+
+  /* Cards */
+  .card-head{padding:10px 13px;flex-wrap:wrap;gap:6px;}
+  .card-body{padding:12px;gap:10px;}
+  .card-topic{font-size:12px;}
+  .prompt-box{font-size:11px;padding:9px 11px;}
+  .copy-btn{font-size:10px;padding:3px 9px;}
+
+  /* Modal */
+  .modal{padding:18px 14px;max-height:92vh;}
+  .modal-title{font-size:18px;}
+
+  /* SASHA cards */
+  .strategy-card{margin-bottom:10px;}
+  .s-head{flex-wrap:wrap;gap:5px;padding:10px 13px;}
+  .s-pillar{font-size:8px;}
+  .s-body{padding:0 13px 13px;gap:9px;}
+  .s-val{font-size:11px;padding:8px 10px;}
+  .s-copy{font-size:10px;padding:3px 9px;}
+  .s-viral{font-size:13px;}
+
+  /* Video studio */
+  .video-card-head{flex-wrap:wrap;gap:5px;padding:10px 13px;}
+  .video-card-body{padding:12px;gap:9px;}
+  .video-type-badge{font-size:8px;}
+  .dur-badge{font-size:9px;}
+  .img-prompt-area{font-size:11px;padding:9px 11px;}
+  .transition-box{padding:10px 11px;}
+
+  /* Video upload grid — stack on mobile */
+  #video-upload-grid{
+    display:flex!important;flex-direction:column!important;gap:8px!important;
+  }
+
+  /* History */
+  .hist-head{padding:2px 0;}
+  .hist-item{padding:8px 10px;font-size:11px;}
+  .hist-date{font-size:9px;}
+
+  /* Carousel */
+  .car-slide{padding:12px;}
+
+  /* Fix overflow on any flex rows */
+  .row{flex-wrap:wrap;}
+}
+
+/* Extra small — phones under 380px */
+@media(max-width:380px){
+  .tab{padding:7px 9px;font-size:10px;}
+  .p-title{font-size:18px;}
+  .chip{padding:4px 8px;font-size:10px;}
 }
 
 ::-webkit-scrollbar{width:3px;}
@@ -230,6 +321,7 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="tab" id="tab-hasbara" onclick="go('hasbara')">🔴 Image Studio</div>
     <div class="tab" id="tab-sasha" onclick="go('sasha')">⚡ SASHA</div>
     <div class="tab" id="tab-carousel" onclick="go('carousel')">📋 Carousel</div>
+    <div class="tab" id="tab-video" onclick="go('video')">🎬 Video Studio</div>
   </div>
 
   <!-- ── DAILY PANEL ── -->
@@ -319,12 +411,6 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="loading" id="extract-load"><div class="spin"></div><span id="extract-load-txt">Analyzing image...</span></div>
     <div class="cards" id="extract-results"></div>
-
-    <div id="extract-add-btns" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:4px;" class="row">
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;" onclick="addOneVariant('extract','natural')">+ Add natural pose</button>
-      <button class="btn-ghost" style="font-size:12px;padding:9px 14px;border-color:var(--teal);color:var(--teal);" onclick="addOneVariant('extract','candid')">+ Add candid pose</button>
-    </div>
-
     <div class="hist-head"><span class="hist-title">Previous extractions</span><button class="hist-clear" onclick="clearHist('extract')">Clear all</button></div>
     <div class="hist-list" id="extract-hist"></div>
 
@@ -500,6 +586,97 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="hist-list" id="car-hist"></div>
   </div>
 
+  <!-- ── VIDEO STUDIO PANEL ── -->
+  <div class="panel" id="panel-video">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+      <div>
+        <div class="p-title">Video Studio <span style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:var(--text3);letter-spacing:0;">— KLING3 Prompt Generator</span></div>
+        <div class="p-desc">Describe a scene or upload 1-2 images. One image → animation ideas. Two images → transition script for KLING AI start/end frame.</div>
+      </div>
+      <div style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:50%;width:52px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;">🎬</div>
+    </div>
+
+    <!-- Image upload section -->
+    <div style="margin-top:16px;margin-bottom:20px;">
+      <div class="lbl">Upload images <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — 1 image for animation ideas, 2 images for transition)</span></div>
+      <div id="video-upload-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+
+        <!-- Image A -->
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">Frame A</div>
+          <div id="video-img-a-box" style="border:1.5px dashed var(--border2);border-radius:var(--r);padding:16px 12px;text-align:center;position:relative;">
+            <div id="video-img-a-empty">
+              <div style="font-size:20px;margin-bottom:6px;">📎</div>
+              <label for="video-img-a" style="display:inline-block;background:var(--surface);border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);">Choose image</label>
+              <input type="file" id="video-img-a" accept="image/*" style="display:none;" onchange="onVideoImg('a',event)">
+            </div>
+            <div id="video-img-a-preview" style="display:none;">
+              <img id="video-img-a-thumb" style="max-width:100%;max-height:120px;border-radius:6px;object-fit:contain;display:block;margin:0 auto 6px;">
+              <button class="btn-ghost" style="font-size:10px;padding:3px 10px;" onclick="clearVideoImg('a')">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image B -->
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">Frame B <span style="font-weight:400;text-transform:none;">(transition end)</span></div>
+          <div id="video-img-b-box" style="border:1.5px dashed var(--border);border-radius:var(--r);padding:16px 12px;text-align:center;position:relative;opacity:.6;">
+            <div id="video-img-b-empty">
+              <div style="font-size:20px;margin-bottom:6px;">📎</div>
+              <label for="video-img-b" style="display:inline-block;background:var(--surface);border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);">Choose image</label>
+              <input type="file" id="video-img-b" accept="image/*" style="display:none;" onchange="onVideoImg('b',event)">
+            </div>
+            <div id="video-img-b-preview" style="display:none;">
+              <img id="video-img-b-thumb" style="max-width:100%;max-height:120px;border-radius:6px;object-fit:contain;display:block;margin:0 auto 6px;">
+              <button class="btn-ghost" style="font-size:10px;padding:3px 10px;" onclick="clearVideoImg('b')">✕ Remove</button>
+            </div>
+          </div>
+          <div id="video-transition-hint" style="font-size:10px;color:var(--text3);margin-top:4px;display:none;">✨ Transition mode active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content direction -->
+    <div class="lbl">Content direction</div>
+    <div class="chips" id="video-direction"></div>
+
+    <!-- Duration -->
+    <div class="lbl">Duration</div>
+    <div class="chips" id="video-duration"></div>
+
+    <!-- Scene description -->
+    <div style="margin-bottom:18px;">
+      <div class="lbl">Scene description <span style="color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional — describe, or leave blank to auto-suggest)</span></div>
+      <textarea class="field" id="video-scene" rows="2" placeholder="e.g. Mika sitting in her kitchen with a coffee, morning light&#10;Leave blank and I'll suggest something good"></textarea>
+    </div>
+
+    <!-- Scene setting for suggestion -->
+    <div id="video-setting-wrap">
+      <div class="lbl">Or pick a setting for the suggested scene</div>
+      <div class="chips" id="video-setting"></div>
+    </div>
+
+    <div class="row">
+      <button class="btn-ghost" id="video-btn" onclick="runVideo()" style="border-color:#a78bfa;color:#a78bfa;font-size:13px;padding:11px 20px;">🎬 Generate Video Prompts</button>
+      <button class="btn-ghost" onclick="clearVideoAll()">Clear all</button>
+    </div>
+
+    <div class="loading" id="video-load"><div class="spin"></div><span id="video-load-txt">Generating KLING3 prompts...</span></div>
+
+    <div id="video-results"></div>
+
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+      <div class="hist-head" style="cursor:pointer;" onclick="toggleHist('video')">
+        <span class="hist-title">Previous sessions</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="hist-toggle" id="video-hist-btn" onclick="event.stopPropagation();toggleHist('video')">Expand</button>
+          <button class="hist-clear" onclick="event.stopPropagation();clearHist('video')">Clear all</button>
+        </div>
+      </div>
+      <div class="hist-list" id="video-hist" style="display:none;margin-top:8px;"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- SETTINGS MODAL -->
@@ -560,12 +737,16 @@ let hasbaraOutfit = 'auto';
 let hasbaraTone = 'cynical';
 let imgB64 = null;
 let imgType = 'image/jpeg';
-let _extractLastSystem = '';
-let _extractLastOutfit = '';
 
 let sashaFocus = 'both';
 let sashaVibe = 'mix';
 let histSasha   = JSON.parse(localStorage.getItem('ms_hist_sasha')   || '[]');
+let videoDirection = 'reaction';
+let videoImgAB64 = null; let videoImgAType = 'image/jpeg';
+let videoImgBB64 = null; let videoImgBType = 'image/jpeg';
+let videoDuration = '5s';
+let videoSetting = 'bedroom';
+let histVideo = JSON.parse(localStorage.getItem('ms_hist_video') || '[]');
 let histDaily   = JSON.parse(localStorage.getItem('ms_hist_daily')   || '[]');
 let histExtract = JSON.parse(localStorage.getItem('ms_hist_extract') || '[]');
 let histHasbara = JSON.parse(localStorage.getItem('ms_hist_hasbara') || '[]');
@@ -582,6 +763,26 @@ const SASHA_VIBE_OPTS = [
   {v:'motivational', l:'💥 Real-talk motivational'},
   {v:'funny',        l:'😂 Funny / relatable'},
   {v:'trending',     l:'📈 Whatever is trending today'}
+];
+const VIDEO_DIRECTION_OPTS = [
+  {v:'ambient',    l:'🌊 Ambient Loop'},
+  {v:'reaction',   l:'😏 Reaction Moment'},
+  {v:'transition', l:'✨ Transition / Reveal'},
+  {v:'mixed',      l:'🎲 All styles'}
+];
+const VIDEO_DURATION_OPTS = [
+  {v:'5s', l:'5 sec — Loop'},
+  {v:'10s', l:'10 sec — Scene'}
+];
+const VIDEO_SETTING_OPTS = [
+  {v:'bedroom',      l:'🛏 Bedroom'},
+  {v:'kitchen',      l:'🍳 Kitchen'},
+  {v:'livingroom',   l:'🛋 Living Room'},
+  {v:'israel-street',l:'🌴 Israel Street'},
+  {v:'cafe',         l:'☕ Café'},
+  {v:'beach',        l:'🏖 Beach'},
+  {v:'elevator',     l:'🏢 Elevator'},
+  {v:'rooftop',      l:'🌆 Rooftop'}
 ];
 const DAILY_MOOD_OPTS = [
   {v:'none',l:'✦ No mood / natural'},
@@ -728,6 +929,9 @@ function loadSettings() {
 function buildChips() {
   mkChips('sasha-focus', SASHA_FOCUS_OPTS, 'both',  'on-gold', v => sashaFocus = v);
   mkChips('sasha-vibe',  SASHA_VIBE_OPTS,  'mix',   'on-gold', v => sashaVibe = v);
+  mkChips('video-direction', VIDEO_DIRECTION_OPTS, 'reaction',   'on-gold', v => videoDirection = v);
+  mkChips('video-duration',  VIDEO_DURATION_OPTS,  '5s',         'on-gold', v => videoDuration = v);
+  mkChips('video-setting',   VIDEO_SETTING_OPTS,   'bedroom',    'on-gold', v => videoSetting = v);
   mkChips('daily-mood',   DAILY_MOOD_OPTS, 'none',    'on-teal',  v => dailyMood = v);
   mkChips('daily-hair',   HAIR_OPTS,       'default', 'on-teal',  v => dailyHair = v);
   mkChips('daily-outfit', OUTFIT_OPTS,     'auto',    'on-teal',  v => dailyOutfit = v);
@@ -760,7 +964,7 @@ function mkChips(containerId, opts, defaultVal, activeClass, setter) {
 
 // ── TAB SWITCHING ────────────────────────────────────────
 function go(tab) {
-  ['daily','extract','hasbara','sasha','carousel'].forEach(t => {
+  ['daily','extract','hasbara','sasha','carousel','video'].forEach(t => {
     document.getElementById('panel-' + t).classList.toggle('active', t === tab);
     const el = document.getElementById('tab-' + t);
     el.className = 'tab' + (t === tab ? ' t-' + t : '');
@@ -778,6 +982,10 @@ function escJ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").re
 function toast(m) {
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = m;
   document.body.appendChild(t); setTimeout(() => t.remove(), 2000);
+}
+
+function copyCardText(btn, idx) {
+  copyTxt(btn, _cardTexts[idx] || '');
 }
 
 async function copyTxt(btn, txt) {
@@ -863,16 +1071,21 @@ function parseJSON(raw, arr) {
 }
 
 // ── RENDER HELPERS ───────────────────────────────────────
+const _cardTexts = {};
+let _cardTextIdx = 0;
+
 function makeCard(badgeClass, badgeText, topic, sections, delay) {
   const card = document.createElement('div');
   card.className = 'card';
   card.style.animationDelay = delay + 's';
   const rows = sections.map(s => {
     if (!s.text) return '';
+    const idx = _cardTextIdx++;
+    _cardTexts[idx] = s.text;
     return `<div>
       <div class="sec-label ${s.cls||''}">${escH(s.label)}</div>
       <div class="prompt-box" ${s.rtl ? 'dir="rtl"' : ''}>${escH(s.text)}</div>
-      <button class="copy-btn" onclick="copyTxt(this,'${escJ(s.text)}')">Copy</button>
+      <button class="copy-btn" onclick="copyCardText(this,${idx})">Copy</button>
     </div>`;
   }).join('');
   card.innerHTML = `
@@ -1025,9 +1238,6 @@ Return JSON only:
     localStorage.setItem('ms_hist_extract', JSON.stringify(histExtract));
     renderExtractData(res, data);
     renderAllHist();
-    _extractLastSystem = system;
-    _extractLastOutfit = outfitOverride || 'outfit from image — keep exactly the same';
-    document.getElementById('extract-add-btns').style.display = 'flex';
   } catch(e) {
     res.innerHTML = errCard(e.message);
   }
@@ -1118,6 +1328,411 @@ function now() {
   return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
 }
 
+// ── VIDEO STUDIO ─────────────────────────────────────────
+// ── VIDEO IMAGE HANDLERS ─────────────────────────────────
+function onVideoImg(slot, e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const b64 = ev.target.result.split(',')[1];
+    const mime = file.type || 'image/jpeg';
+    if (slot === 'a') {
+      videoImgAB64 = b64; videoImgAType = mime;
+      document.getElementById('video-img-a-thumb').src = ev.target.result;
+      document.getElementById('video-img-a-empty').style.display = 'none';
+      document.getElementById('video-img-a-preview').style.display = 'block';
+      document.getElementById('video-img-a-box').style.borderColor = '#a78bfa';
+      // Unlock Frame B
+      document.getElementById('video-img-b-box').style.opacity = '1';
+    } else {
+      videoImgBB64 = b64; videoImgBType = mime;
+      document.getElementById('video-img-b-thumb').src = ev.target.result;
+      document.getElementById('video-img-b-empty').style.display = 'none';
+      document.getElementById('video-img-b-preview').style.display = 'block';
+      document.getElementById('video-img-b-box').style.borderColor = '#a78bfa';
+      document.getElementById('video-transition-hint').style.display = 'block';
+      // Auto-switch to transition direction
+      const chips = document.querySelectorAll('#video-direction .chip');
+      chips.forEach(c => { c.className = 'chip'; });
+      const transChip = [...chips].find(c => c.textContent.includes('Transition'));
+      if (transChip) { transChip.className = 'chip on-gold'; videoDirection = 'transition'; }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearVideoImg(slot) {
+  if (slot === 'a') {
+    videoImgAB64 = null;
+    document.getElementById('video-img-a-empty').style.display = 'block';
+    document.getElementById('video-img-a-preview').style.display = 'none';
+    document.getElementById('video-img-a-box').style.borderColor = '';
+    document.getElementById('video-img-a').value = '';
+    // Also clear B if A cleared
+    clearVideoImg('b');
+    document.getElementById('video-img-b-box').style.opacity = '.6';
+  } else {
+    videoImgBB64 = null;
+    document.getElementById('video-img-b-empty').style.display = 'block';
+    document.getElementById('video-img-b-preview').style.display = 'none';
+    document.getElementById('video-img-b-box').style.borderColor = '';
+    document.getElementById('video-img-b').value = '';
+    document.getElementById('video-transition-hint').style.display = 'none';
+  }
+}
+
+function clearVideoAll() {
+  clearVideoImg('a');
+  document.getElementById('video-results').innerHTML = '';
+  document.getElementById('video-scene').value = '';
+}
+
+async function runVideo() {
+  if (!KEY) { alert('No API key'); return; }
+  const btn = document.getElementById('video-btn');
+  const load = document.getElementById('video-load');
+  const loadTxt = document.getElementById('video-load-txt');
+  const res = document.getElementById('video-results');
+  btn.disabled = true; load.classList.add('show');
+  loadTxt.textContent = 'Generating KLING3 prompts...';
+
+  const sceneInput = document.getElementById('video-scene').value.trim();
+  const char = getChar();
+  const homeRooms = {
+    bedroom:    localStorage.getItem('ms_bed') || 'Modern warm apartment bedroom. Light oak bed, white linen, warm pendant light, sheer curtains. Slightly lived-in.',
+    kitchen:    localStorage.getItem('ms_kit') || 'Open plan Israeli apartment kitchen. White cabinets, light wood counter, espresso machine. Authentic.',
+    livingroom: localStorage.getItem('ms_sal') || 'Mika apartment living room. Cozy beige sofa, TV on wall, oak coffee table, warm lighting.',
+    bathroom:   localStorage.getItem('ms_bath')|| 'Small modern bathroom. White tiles, frameless mirror, skincare on counter, warm vanity light.'
+  };
+
+  const settingDescriptions = {
+    bedroom:       homeRooms.bedroom,
+    kitchen:       homeRooms.kitchen,
+    livingroom:    homeRooms.livingroom,
+    'israel-street': 'Tel Aviv street, warm Mediterranean light, Bauhaus buildings, Hebrew signs blurred in background',
+    cafe:          'Israeli café, warm wood interior, espresso, ambient light, other patrons blurred',
+    beach:         'Tel Aviv beach, Mediterranean sea, golden hour warm light',
+    elevator:      'Modern elevator interior, marble walls, gold trim details, mirror reflections, warm ceiling light',
+    rooftop:       'Tel Aviv rooftop, city skyline at golden hour or dusk, warm ambient light'
+  };
+
+  const directionDesc = {
+    ambient:    'Ambient loop — subtle environmental motion: steam, hair sway, light shift, slow breath. Camera barely moves. Designed to loop seamlessly.',
+    reaction:   'Reaction moment — Mika reacts to something off-camera. Expression shift, gaze change, subtle head movement. Confident and unbothered energy.',
+    transition: 'Transition/reveal — SPATIAL movement between two genuinely different physical states. NOT just expression or head direction changes. Must involve real body movement through space: walking from one part of a room to another, changing body position entirely (lying → sitting → standing), turning the full body around, entering or exiting frame, moving closer or further from camera. Frame A and Frame B must show Mika in completely different positions/locations within the scene. Think cinematic, not just facial.',
+    mixed:      'Generate one of each style: ambient, reaction, transition, and one wildcard creative approach.'
+  };
+
+  const durationDesc = {
+    '5s':  '5 seconds — optimized for loop. Keep motion contained and cyclical.',
+    '10s': '10 seconds — fuller scene. Motion can develop and resolve.'
+  };
+
+  const system = `You are a KLING3 video prompt specialist for a lifestyle Instagram account. The character is Mika — ${char}. ${NECKLACE}
+
+You generate highly targeted KLING3 animation prompts that create specific emotional responses in viewers. You understand how short video content works on Instagram and TikTok.
+
+KLING3 PROMPT RULES:
+- Start with camera/motion description, then character motion, then ambient details
+- Be specific about speed: "slowly", "gently", "subtly", "quick sharp"
+- Specify what stays still vs what moves
+- For transitions: describe start state, the motion, end state
+- Duration: ${durationDesc[videoDuration]}
+- Never describe things KLING can't do: complex choreography, rapid scene cuts, text appearing
+- Always end with mood/atmosphere note
+
+CONTENT DIRECTION: ${directionDesc[videoDirection]}
+
+Return JSON only — no markdown:
+{
+  "suggested_image_prompt": "If no scene was provided — a complete Nano Banana image generation prompt for a great image to animate. Must include Mika full appearance, necklace, outfit, setting, pose, authenticity. If scene was provided, refine it into a complete image prompt.",
+  "scene_summary": "one line describing the scene",
+  "videos": [
+    {
+      "type": "ambient" or "reaction" or "transition" or "wildcard",
+      "title": "short evocative title",
+      "duration": "${videoDuration}",
+      "kling_prompt": "complete KLING3 animation prompt",
+      "why_it_works": "one sentence — what this does for the viewer",
+      "transition_frame_b": "ONLY for transition type: complete Nano Banana prompt for Frame B — must show a SPATIALLY DIFFERENT position from Frame A. Not just a different expression. Examples: Frame A she is at the kitchen counter, Frame B she is leaning against the opposite wall. Frame A she is lying on her belly in bed, Frame B she is sitting up on the edge of the bed. The physical location or body orientation within the scene must genuinely change."
+    }
+  ]
+}
+Generate exactly 4 video objects. If direction is 'mixed', make one of each type. Otherwise focus on the chosen direction with variations.`;
+
+  const settingDesc = settingDescriptions[videoSetting] || settingDescriptions.bedroom;
+  const userMsg = sceneInput
+    ? `Scene: ${sceneInput}
+Generate 4 KLING3 animation prompts for this scene. Duration: ${videoDuration}.`
+    : `No scene provided — suggest a great one and generate 4 KLING3 prompts. Setting to use: ${settingDesc}. Make it interesting and authentic — something that would genuinely perform well on Instagram. Duration: ${videoDuration}.`;
+
+  try {
+    let raw;
+
+    if (videoImgBB64) {
+      // TWO images — transition mode
+      loadTxt.textContent = 'Analyzing both frames for transition...';
+      const transSystem = `You are a KLING3 transition video specialist. You receive Frame A and Frame B — the start and end images for a KLING AI transition video.
+
+IMPORTANT: The best transitions are SPATIAL — the character moves through space in a meaningful way, not just changes expression. Analyze what physically changes between A and B and build a prompt that captures that movement believably.
+
+Analyze both images carefully:
+1. What is Mika's exact position, body orientation, and location in the scene in Frame A?
+2. What changed in Frame B — is it spatial (body moved, location changed) or just facial?
+3. What is the most natural physical path between these two states?
+4. What camera behavior would make this transition most cinematic?
+
+Return JSON only:
+{
+  "frame_a_description": "precise description of Frame A — body position, location in scene, what she is doing",
+  "frame_b_description": "precise description of Frame B — what physically changed from A",
+  "transition_type": "describe the actual movement — e.g. walks from counter to window / rolls from belly to back / turns full body around / stands up from sitting",
+  "complexity": "simple (expression/face only) or spatial (body/location moves)",
+  "duration": "${videoDuration}",
+  "kling_prompt": "Complete KLING3 prompt — describe the full physical motion from A to B: exact starting body state, the movement through space, exact ending body state, speed (slow/medium), camera movement if any, lighting/atmosphere. Be specific about limbs, weight shifts, direction of movement.",
+  "kling_prompt_alt": "Alternative approach — different camera angle or movement style for the same A to B transition",
+  "tips": "Practical tips for KLING AI — especially if this is a spatial transition, note what to watch for (body consistency, background stability, speed settings)"
+}`;
+      const messages = [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: videoImgAType, data: videoImgAB64 } },
+          { type: 'image', source: { type: 'base64', media_type: videoImgBType, data: videoImgBB64 } },
+          { type: 'text', text: `These are Frame A and Frame B for a KLING AI transition video. Duration: ${videoDuration}. Analyze both and generate the transition script.` }
+        ]
+      }];
+      const res2 = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, system:transSystem, messages })
+      });
+      if (!res2.ok) { const e = await res2.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+res2.status); }
+      const d2 = await res2.json();
+      raw = d2.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const tdata = parseJSON(raw, false);
+      renderTransition(res, tdata);
+      const entry2 = { date: now(), direction: 'transition', summary: tdata.transition_type || 'Transition', data: {videos:[], transition: tdata} };
+      histVideo.unshift(entry2); if (histVideo.length > 10) histVideo.pop();
+      localStorage.setItem('ms_hist_video', JSON.stringify(histVideo));
+      renderAllHist();
+
+    } else if (videoImgAB64) {
+      // ONE image — analyze it and generate animation ideas
+      loadTxt.textContent = 'Analyzing your image...';
+      const oneImgSystem = system + '\n\nYou are analyzing a real uploaded image. Base the scene_summary and suggested_image_prompt on what you actually see. Generate 4 KLING3 animation prompts specifically tailored to THIS image — its exact pose, setting, lighting, and mood.';
+      const messages = [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: videoImgAType, data: videoImgAB64 } },
+          { type: 'text', text: userMsg + ' Base everything on the uploaded image.' }
+        ]
+      }];
+      const res3 = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:3000, system:oneImgSystem, messages })
+      });
+      if (!res3.ok) { const e = await res3.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+res3.status); }
+      const d3 = await res3.json();
+      raw = d3.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const data3 = parseJSON(raw, false);
+      if (!data3 || !data3.videos) throw new Error('No video prompts returned');
+      renderVideo(res, data3);
+      const entry3 = { date: now(), direction: videoDirection, summary: data3.scene_summary, data: data3 };
+      histVideo.unshift(entry3); if (histVideo.length > 10) histVideo.pop();
+      localStorage.setItem('ms_hist_video', JSON.stringify(histVideo));
+      renderAllHist();
+
+    } else {
+      // NO image — text only
+      loadTxt.textContent = 'Generating KLING3 prompts...';
+      raw = await api(system, userMsg, false);
+      const data = parseJSON(raw, false);
+      if (!data || !data.videos) throw new Error('No video prompts returned');
+      renderVideo(res, data);
+      const entry = { date: now(), direction: videoDirection, summary: data.scene_summary, data };
+      histVideo.unshift(entry); if (histVideo.length > 10) histVideo.pop();
+      localStorage.setItem('ms_hist_video', JSON.stringify(histVideo));
+      renderAllHist();
+    }
+
+  } catch(e) {
+    res.innerHTML = errCard(e.message);
+  }
+  btn.disabled = false; load.classList.remove('show');
+}
+
+function renderVideo(container, data) {
+  container.innerHTML = '';
+  const typeClass = { ambient:'vt-ambient', reaction:'vt-reaction', transition:'vt-transition', wildcard:'vt-wildcard' };
+  const typeLabel = { ambient:'🌊 Ambient', reaction:'😏 Reaction', transition:'✨ Transition', wildcard:'🎲 Wildcard' };
+
+  function makePromptRow(label, text, cls) {
+    if (!text) return null;
+    const wrap = document.createElement('div');
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label ' + (cls||'t');
+    lbl.textContent = label;
+    const box = document.createElement('div');
+    box.className = 'prompt-box';
+    box.textContent = text;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.onclick = () => copyTxt(btn, text);
+    wrap.appendChild(lbl); wrap.appendChild(box); wrap.appendChild(btn);
+    return wrap;
+  }
+
+  // Image prompt card
+  if (data.suggested_image_prompt) {
+    const c = document.createElement('div');
+    c.className = 'video-card'; c.style.animationDelay = '0s';
+    const h = document.createElement('div'); h.className = 'video-card-head';
+    h.innerHTML = '<span class="video-type-badge" style="background:rgba(74,184,160,.15);color:var(--teal);">📸 IMAGE PROMPT</span>';
+    const s = document.createElement('span'); s.style.cssText='font-size:12px;color:var(--text2);';
+    s.textContent = data.scene_summary || '';
+    h.appendChild(s); c.appendChild(h);
+    const b = document.createElement('div'); b.className = 'video-card-body';
+    const row = makePromptRow('Generate this image first in Nano Banana', data.suggested_image_prompt, 't');
+    if (row) { row.querySelector('.prompt-box').className = 'img-prompt-area'; b.appendChild(row); }
+    c.appendChild(b); container.appendChild(c);
+  }
+
+  // Video cards
+  (data.videos || []).forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card'; card.style.animationDelay = ((i+1)*0.08)+'s';
+
+    const head = document.createElement('div'); head.className = 'video-card-head';
+    const badge = document.createElement('span');
+    badge.className = 'video-type-badge ' + (typeClass[v.type]||'vt-ambient');
+    badge.textContent = typeLabel[v.type] || v.type;
+    const title = document.createElement('span');
+    title.style.cssText = 'font-size:12px;font-weight:500;color:var(--text);';
+    title.textContent = v.title || '';
+    const dur = document.createElement('span');
+    dur.className = 'dur-badge'; dur.style.marginLeft = 'auto';
+    dur.textContent = v.duration || videoDuration;
+    head.appendChild(badge); head.appendChild(title); head.appendChild(dur);
+    card.appendChild(head);
+
+    const body = document.createElement('div'); body.className = 'video-card-body';
+    if (v.why_it_works) {
+      const why = document.createElement('div');
+      why.style.cssText = 'font-size:11px;color:var(--text2);font-style:italic;';
+      why.textContent = v.why_it_works; body.appendChild(why);
+    }
+    const krow = makePromptRow('KLING3 prompt', v.kling_prompt, 't');
+    if (krow) body.appendChild(krow);
+
+    if (v.transition_frame_b) {
+      const tbox = document.createElement('div'); tbox.className = 'transition-box';
+      const tlbl = document.createElement('div'); tlbl.className = 'transition-label';
+      tlbl.textContent = 'Frame B — generate this second image';
+      const ttxt = document.createElement('div');
+      ttxt.style.cssText = 'font-size:12px;color:var(--text2);line-height:1.6;';
+      ttxt.textContent = v.transition_frame_b;
+      const tbtn = document.createElement('button'); tbtn.className = 'copy-btn';
+      tbtn.textContent = 'Copy Frame B prompt';
+      tbtn.onclick = () => copyTxt(tbtn, v.transition_frame_b);
+      tbox.appendChild(tlbl); tbox.appendChild(ttxt); tbox.appendChild(tbtn);
+      body.appendChild(tbox);
+    }
+    card.appendChild(body); container.appendChild(card);
+  });
+}
+
+function renderTransition(container, data) {
+  container.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.style.animationDelay = '0s';
+
+  // Build safely using DOM — avoids nested quote/escaping issues
+  const head = document.createElement('div');
+  head.className = 'video-card-head';
+  head.innerHTML = '<span class="video-type-badge vt-transition">✨ TRANSITION SCRIPT</span>';
+  const typeSpan = document.createElement('span');
+  typeSpan.style.cssText = 'font-size:12px;color:var(--text2);';
+  typeSpan.textContent = data.transition_type || 'A → B';
+  if (data.complexity) {
+    const compSpan = document.createElement('span');
+    const isSpatial = data.complexity === 'spatial';
+    compSpan.style.cssText = 'font-size:10px;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:' + (isSpatial ? 'rgba(167,139,250,.15)' : 'rgba(74,184,160,.15)') + ';color:' + (isSpatial ? '#a78bfa' : 'var(--teal)') + ';';
+    compSpan.textContent = isSpatial ? '🏃 Spatial' : '😶 Facial';
+    typeSpan.appendChild(compSpan);
+  }
+  const durSpan = document.createElement('span');
+  durSpan.className = 'dur-badge';
+  durSpan.style.marginLeft = 'auto';
+  durSpan.textContent = data.duration || videoDuration;
+  head.appendChild(typeSpan);
+  head.appendChild(durSpan);
+  card.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'video-card-body';
+
+  // Frame A/B grid
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+  ['a','b'].forEach(f => {
+    const col = document.createElement('div');
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label';
+    lbl.style.color = '#a78bfa';
+    lbl.textContent = 'Frame ' + f.toUpperCase();
+    const box = document.createElement('div');
+    box.className = 'prompt-box';
+    box.style.fontSize = '11px';
+    box.textContent = (f === 'a' ? data.frame_a_description : data.frame_b_description) || '';
+    col.appendChild(lbl); col.appendChild(box);
+    grid.appendChild(col);
+  });
+  body.appendChild(grid);
+
+  // Prompt sections
+  [
+    { label: 'KLING3 Prompt — Primary', text: data.kling_prompt },
+    { label: 'KLING3 Prompt — Alternative take', text: data.kling_prompt_alt }
+  ].forEach(s => {
+    if (!s.text) return;
+    const wrap = document.createElement('div');
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label t';
+    lbl.textContent = s.label;
+    const box = document.createElement('div');
+    box.className = 'prompt-box';
+    box.textContent = s.text;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.onclick = () => copyTxt(btn, s.text);
+    wrap.appendChild(lbl); wrap.appendChild(box); wrap.appendChild(btn);
+    body.appendChild(wrap);
+  });
+
+  // Tips
+  if (data.tips) {
+    const tbox = document.createElement('div');
+    tbox.className = 'transition-box';
+    const tlbl = document.createElement('div');
+    tlbl.className = 'transition-label';
+    tlbl.textContent = '💡 Tips for KLING AI';
+    const ttxt = document.createElement('div');
+    ttxt.style.cssText = 'font-size:12px;color:var(--text2);line-height:1.6;';
+    ttxt.textContent = data.tips;
+    tbox.appendChild(tlbl); tbox.appendChild(ttxt);
+    body.appendChild(tbox);
+  }
+
+  card.appendChild(body);
+  container.appendChild(card);
+}
+
 function renderAllHist() {
   renderHist('daily-hist', histDaily, 'teal', i => {
     const e = histDaily[i]; if (!e?.data) return;
@@ -1143,6 +1758,12 @@ function renderAllHist() {
     renderSasha(document.getElementById('sasha-results'), e.ideas);
     document.getElementById('sasha-results').scrollIntoView({ behavior:'smooth', block:'start' });
   }, h => h.vibe + ' · ' + h.focus);
+
+  renderHist('video-hist', histVideo, 'gold', i => {
+    const e = histVideo[i]; if (!e?.data) return;
+    renderVideo(document.getElementById('video-results'), e.data);
+    document.getElementById('video-results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, h => h.summary || h.direction || 'Session');
 }
 
 function renderHist(elId, arr, color, onClick, labelFn) {
@@ -1164,6 +1785,7 @@ function clearHist(tab) {
   if (tab === 'extract') { histExtract = []; localStorage.removeItem('ms_hist_extract'); }
   if (tab === 'hasbara') { histHasbara = []; localStorage.removeItem('ms_hist_hasbara'); }
   if (tab === 'sasha')   { histSasha = [];   localStorage.removeItem('ms_hist_sasha'); }
+  if (tab === 'video')   { histVideo = [];   localStorage.removeItem('ms_hist_video'); }
   renderAllHist();
 }
 
@@ -1172,6 +1794,16 @@ const MODE_DESC = {
   natural: 'Natural, relaxed poses — standing, sitting, looking at camera or slightly away. Clean and polished but authentic.',
   candid: 'Caught in a real moment — mid-laugh, fixing hair, lying on sofa scrolling phone, leaning against a wall looking away, sitting on a counter, glancing out a window. Feels like a real person caught naturally, NOT a posed model shoot. The viewer should feel like they caught a private moment.'
 };
+
+function toggleHist(tab) {
+  const ids = {daily:'daily-hist',extract:'extract-hist',hasbara:'has-hist',sasha:'sasha-hist',carousel:'car-hist',video:'video-hist'};
+  const list = document.getElementById(ids[tab]);
+  const btn  = document.getElementById(tab + '-hist-btn');
+  if (!list) return;
+  const hidden = list.style.display === 'none' || list.style.display === '';
+  list.style.display = hidden ? 'flex' : 'none';
+  if (btn) btn.textContent = hidden ? 'Collapse' : 'Expand';
+}
 
 function setMode(tab, mode, btn) {
   const toggleId = tab === 'daily' ? 'daily-mode-toggle' : tab === 'hasbara' ? 'has-mode-toggle' : null;
@@ -1371,12 +2003,18 @@ Search the web first for trending Israel, Jewish, AI content, motivational conte
 }
 
 const _sashaPrompts = {};
+const _sashaIdeas = {};
 
-function copySashaPrompt(btn, idx, variant) {
-  const p = _sashaPrompts[idx];
-  if (!p) return;
-  const txt = variant === 'with' ? (p.with || p.clean || '') : (p.clean || p.with || '');
-  copyTxt(btn, txt);
+function copySashaPrompt(btn, idx, field) {
+  if (field === 'with' || field === 'clean') {
+    const p = _sashaPrompts[idx];
+    if (!p) return;
+    copyTxt(btn, field === 'with' ? (p.with || p.clean || '') : (p.clean || p.with || ''));
+  } else {
+    const idea = _sashaIdeas[idx];
+    if (!idea) return;
+    copyTxt(btn, idea[field] || '');
+  }
 }
 
 function renderSasha(container, ideas) {
@@ -1386,15 +2024,11 @@ function renderSasha(container, ideas) {
   const accountLabel = { hasbara: 'Hasbara', lifestyle: 'Lifestyle', both: 'Both accounts' };
 
   ideas.forEach((idea, i) => {
-    // Store prompts for copy buttons
     _sashaPrompts[i] = {
       with: idea.nano_prompt_with_text || idea.nano_prompt || '',
       clean: idea.nano_prompt_clean || idea.nano_prompt || ''
     };
-
-    const card = document.createElement('div');
-    card.className = 'strategy-card';
-    card.style.animationDelay = (i * 0.1) + 's';
+    _sashaIdeas[i] = idea;
 
     const ms = idea.mika_studio || {};
     const mikaDetails = [
@@ -1404,73 +2038,137 @@ function renderSasha(container, ideas) {
       ms.outfit && 'Outfit: ' + ms.outfit
     ].filter(Boolean).join(' · ');
 
-    card.innerHTML = `
-      <div class="s-head">
-        <span class="s-pillar ${pillarClass[idea.pillar] || 's-pillar-motivational'}">${pillarLabel[idea.pillar] || idea.pillar}</span>
-        <span class="s-account">${accountLabel[idea.account] || idea.account}</span>
-        <span class="s-account" style="background:rgba(74,184,160,.1);color:var(--teal)">${idea.format || 'post'}</span>
-        <span class="s-viral">${idea.viral_score || '🔥'}</span>
-      </div>
-      <div class="s-title">${escH(idea.why_it_works || '')}</div>
-      <div class="s-body">
+    const card = document.createElement('div');
+    card.className = 'strategy-card';
+    card.style.animationDelay = (i * 0.1) + 's';
 
-        <div class="s-row">
-          <div class="s-label" style="color:var(--gold)">Text on image</div>
-          <div style="background:#111;border-radius:8px;padding:18px 16px;position:relative;overflow:hidden;margin-bottom:2px;">
-            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%);pointer-events:none;border-radius:8px;"></div>
-            <div style="font-size:18px;font-weight:700;color:#fff;text-align:center;line-height:1.3;letter-spacing:-.2px;text-shadow:0 2px 8px rgba(0,0,0,.8);position:relative;z-index:1;">${escH(idea.hook_en || '')}</div>
-            <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;margin-top:6px;direction:rtl;position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.8);">${escH(idea.hook_he || '')}</div>
-          </div>
-          <div style="display:flex;gap:6px;">
-            <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hook_en||'')}')">Copy EN</button>
-            <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hook_he||'')}')">Copy HE</button>
-          </div>
-        </div>
+    // ── HEAD ──
+    const head = document.createElement('div');
+    head.className = 's-head';
+    const pillarSpan = document.createElement('span');
+    pillarSpan.className = 's-pillar ' + (pillarClass[idea.pillar] || 's-pillar-motivational');
+    pillarSpan.textContent = pillarLabel[idea.pillar] || idea.pillar;
+    const accountSpan = document.createElement('span');
+    accountSpan.className = 's-account';
+    accountSpan.textContent = accountLabel[idea.account] || idea.account;
+    const fmtSpan = document.createElement('span');
+    fmtSpan.className = 's-account';
+    fmtSpan.style.cssText = 'background:rgba(74,184,160,.1);color:var(--teal)';
+    fmtSpan.textContent = idea.format || 'post';
+    const viralSpan = document.createElement('span');
+    viralSpan.className = 's-viral';
+    viralSpan.textContent = idea.viral_score || '🔥';
+    head.appendChild(pillarSpan); head.appendChild(accountSpan);
+    head.appendChild(fmtSpan); head.appendChild(viralSpan);
+    card.appendChild(head);
 
-        <div class="s-row">
-          <div class="s-label" style="color:var(--coral)">Caption (EN)</div>
-          <div class="s-val">${escH(idea.caption_en || '')}</div>
-          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.caption_en||'')}')">Copy</button>
-        </div>
+    // ── TITLE ──
+    const title = document.createElement('div');
+    title.className = 's-title';
+    title.textContent = idea.why_it_works || '';
+    card.appendChild(title);
 
-        <div class="s-row">
-          <div class="s-label" style="color:var(--coral)">Caption (HE)</div>
-          <div class="s-val s-val-he">${escH(idea.caption_he || '')}</div>
-          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.caption_he||'')}')">Copy</button>
-        </div>
+    // ── BODY ──
+    const body = document.createElement('div');
+    body.className = 's-body';
 
-        <div class="s-row">
-          <div class="s-label">Hashtags</div>
-          <div class="s-val">${escH(idea.hashtags || '')}</div>
-          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.hashtags||'')}')">Copy</button>
-        </div>
+    // Hook preview
+    const hookRow = document.createElement('div');
+    hookRow.className = 's-row';
+    const hookLbl = document.createElement('div');
+    hookLbl.className = 's-label';
+    hookLbl.style.color = 'var(--gold)';
+    hookLbl.textContent = 'Text on image';
+    const hookPreview = document.createElement('div');
+    hookPreview.style.cssText = 'background:#111;border-radius:8px;padding:18px 16px;margin-bottom:2px;';
+    const hookEN = document.createElement('div');
+    hookEN.style.cssText = 'font-size:clamp(13px,4vw,18px);font-weight:700;color:#fff;text-align:center;line-height:1.3;text-shadow:0 2px 8px rgba(0,0,0,.8);';
+    hookEN.textContent = idea.hook_en || '';
+    const hookHE = document.createElement('div');
+    hookHE.style.cssText = 'font-size:clamp(11px,3.5vw,15px);font-weight:600;color:rgba(255,255,255,.8);text-align:center;line-height:1.3;margin-top:6px;direction:rtl;text-shadow:0 2px 8px rgba(0,0,0,.8);';
+    hookHE.textContent = idea.hook_he || '';
+    hookPreview.appendChild(hookEN); hookPreview.appendChild(hookHE);
+    const hookBtns = document.createElement('div');
+    hookBtns.style.cssText = 'display:flex;gap:6px;';
+    const hookBtnEN = document.createElement('button');
+    hookBtnEN.className = 's-copy';
+    hookBtnEN.textContent = 'Copy EN';
+    hookBtnEN.onclick = () => copyTxt(hookBtnEN, idea.hook_en || '');
+    const hookBtnHE = document.createElement('button');
+    hookBtnHE.className = 's-copy';
+    hookBtnHE.textContent = 'Copy HE';
+    hookBtnHE.onclick = () => copyTxt(hookBtnHE, idea.hook_he || '');
+    hookBtns.appendChild(hookBtnEN); hookBtns.appendChild(hookBtnHE);
+    hookRow.appendChild(hookLbl); hookRow.appendChild(hookPreview); hookRow.appendChild(hookBtns);
+    body.appendChild(hookRow);
 
-        ${idea.trending_angle ? `<div class="s-row">
-          <div class="s-label">Trending angle</div>
-          <div class="s-val" style="color:var(--text2);font-style:italic">${escH(idea.trending_angle)}</div>
-        </div>` : ''}
+    // Helper: add a simple s-row with label, value, copy
+    function addRow(labelText, value, labelColor, isRTL) {
+      if (!value) return;
+      const row = document.createElement('div');
+      row.className = 's-row';
+      const lbl = document.createElement('div');
+      lbl.className = 's-label';
+      if (labelColor) lbl.style.color = labelColor;
+      lbl.textContent = labelText;
+      const val = document.createElement('div');
+      val.className = 's-val' + (isRTL ? ' s-val-he' : '');
+      val.textContent = value;
+      const btn = document.createElement('button');
+      btn.className = 's-copy';
+      btn.textContent = 'Copy';
+      btn.onclick = () => copyTxt(btn, value);
+      row.appendChild(lbl); row.appendChild(val); row.appendChild(btn);
+      body.appendChild(row);
+    }
 
-        <div class="s-mika-box">
-          <div class="s-mika-label">⚡ Mika Studio settings</div>
-          <div class="s-mika-val">${escH(mikaDetails)}</div>
-        </div>
+    addRow('Caption (EN)', idea.caption_en, 'var(--coral)');
+    addRow('Caption (HE)', idea.caption_he, 'var(--coral)', true);
+    addRow('Hashtags', idea.hashtags);
+    if (idea.trending_angle) addRow('Trending angle', idea.trending_angle);
 
-        <div class="s-row">
-          <div class="s-label" style="color:var(--gold)">Nano Banana prompts</div>
-          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
-            <button class="s-copy" style="padding:6px 13px;font-size:11px;border-color:var(--gold);color:var(--gold);" onclick="copySashaPrompt(this,${i},'with')">Copy WITH text overlay</button>
-            <button class="s-copy" style="padding:6px 13px;font-size:11px;" onclick="copySashaPrompt(this,${i},'clean')">Copy WITHOUT text</button>
-          </div>
-          <div class="s-val" style="font-size:11px;color:var(--text2);word-break:break-word;white-space:pre-wrap;">${escH(idea.nano_prompt_with_text || idea.nano_prompt || '')}</div>
-        </div>
+    // Mika Studio box
+    const mikaBox = document.createElement('div');
+    mikaBox.className = 's-mika-box';
+    const mikaLbl = document.createElement('div');
+    mikaLbl.className = 's-mika-label';
+    mikaLbl.textContent = '⚡ Mika Studio settings';
+    const mikaVal = document.createElement('div');
+    mikaVal.className = 's-mika-val';
+    mikaVal.textContent = mikaDetails;
+    mikaBox.appendChild(mikaLbl); mikaBox.appendChild(mikaVal);
+    body.appendChild(mikaBox);
 
-        ${idea.kling_prompt ? `<div class="s-row">
-          <div class="s-label" style="color:var(--teal)">KLING3 — Animation prompt</div>
-          <div class="s-val">${escH(idea.kling_prompt)}</div>
-          <button class="s-copy" onclick="copyTxt(this,'${escJ(idea.kling_prompt)}')">Copy</button>
-        </div>` : ''}
+    // Nano Banana prompts
+    const nanoRow = document.createElement('div');
+    nanoRow.className = 's-row';
+    const nanoLbl = document.createElement('div');
+    nanoLbl.className = 's-label';
+    nanoLbl.style.color = 'var(--gold)';
+    nanoLbl.textContent = 'Nano Banana prompts';
+    const nanoBtns = document.createElement('div');
+    nanoBtns.style.cssText = 'display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;';
+    const withBtn = document.createElement('button');
+    withBtn.className = 's-copy';
+    withBtn.style.cssText = 'padding:6px 13px;font-size:11px;border-color:var(--gold);color:var(--gold);';
+    withBtn.textContent = 'Copy WITH text overlay';
+    withBtn.onclick = () => copyTxt(withBtn, idea.nano_prompt_with_text || idea.nano_prompt || '');
+    const cleanBtn = document.createElement('button');
+    cleanBtn.className = 's-copy';
+    cleanBtn.style.cssText = 'padding:6px 13px;font-size:11px;';
+    cleanBtn.textContent = 'Copy WITHOUT text';
+    cleanBtn.onclick = () => copyTxt(cleanBtn, idea.nano_prompt_clean || idea.nano_prompt || '');
+    nanoBtns.appendChild(withBtn); nanoBtns.appendChild(cleanBtn);
+    const nanoPreview = document.createElement('div');
+    nanoPreview.className = 's-val';
+    nanoPreview.style.cssText = 'font-size:11px;color:var(--text2);word-break:break-word;white-space:pre-wrap;';
+    nanoPreview.textContent = idea.nano_prompt_with_text || idea.nano_prompt || '';
+    nanoRow.appendChild(nanoLbl); nanoRow.appendChild(nanoBtns); nanoRow.appendChild(nanoPreview);
+    body.appendChild(nanoRow);
 
-      </div>`;
+    if (idea.kling_prompt) addRow('KLING3 — Animation prompt', idea.kling_prompt, 'var(--teal)');
+
+    card.appendChild(body);
     container.appendChild(card);
   });
 }
@@ -1478,8 +2176,8 @@ function renderSasha(container, ideas) {
 // ── ADD ONE VARIANT ──────────────────────────────────────
 async function addOneVariant(tab, mode) {
   if (!KEY) return;
-  const btnsId = tab === 'daily' ? 'daily-add-btns' : tab === 'extract' ? 'extract-add-btns' : 'has-add-btns';
-  const resId  = tab === 'daily' ? 'daily-results'  : tab === 'extract' ? 'extract-results'  : 'has-results';
+  const btnsId = tab === 'daily' ? 'daily-add-btns' : 'has-add-btns';
+  const resId  = tab === 'daily' ? 'daily-results'  : 'has-results';
   const btns   = document.getElementById(btnsId);
   const res    = document.getElementById(resId);
   const prevCount = res.querySelectorAll('.card').length;
@@ -1492,28 +2190,7 @@ async function addOneVariant(tab, mode) {
 
   let system, user;
 
-  if (tab === 'extract') {
-    if (!_extractLastSystem || !imgB64) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
-    const extractSystem = _extractLastSystem + `
-
-Generate ONE additional variant. Pose style: ${modeInstruction}. Keep EXACT same background, outfit (${_extractLastOutfit}), and character. Only the pose/expression changes. Different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"complete image prompt — never starts with Nano Banana","kling":"KLING3 animation prompt"}`;
-    btns.querySelectorAll('button').forEach(b => { b.disabled = true; b.style.opacity = '.5'; });
-    try {
-      const raw = await apiWithImage(extractSystem, `Generate ONE more pose variant. Style: ${modeInstruction}. Same location, same outfit, different pose. Variant #${prevCount + 1}.`, imgB64, imgType);
-      const data = parseJSON(raw, false);
-      if (data && data.prompt) {
-        const styleLabel = mode === 'candid' ? '📸 CANDID' : '✦ NATURAL';
-        const card = makeCard('badge-teal', styleLabel, data.pose_note || '', [
-          { label: 'Image prompt — Variant ' + (prevCount + 1), cls: 't', text: data.prompt },
-          { label: 'KLING3 — Variant ' + (prevCount + 1), cls: 'g', text: data.kling }
-        ], 0);
-        res.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    } catch(e) { res.insertAdjacentHTML('beforeend', errCard(e.message)); }
-    btns.querySelectorAll('button').forEach(b => { b.disabled = false; b.style.opacity = '1'; });
-    return;
-  } else if (tab === 'daily') {
+  if (tab === 'daily') {
     if (!_dailyLastSystem) { btns.querySelectorAll('button').forEach(b => { b.disabled=false; b.style.opacity='1'; }); return; }
     system = _dailyLastSystem;
     user = `Generate ONE more single pose variant for the same scene. Style: ${modeInstruction}. IMPORTANT: Mika must wear the EXACT SAME outfit as the previous variants: ${_dailyLastOutfit || outfitLine}. Only the pose changes. Must be different from previous ${prevCount} variants. Return JSON: {"pose_note":"brief","prompt":"full Nano Banana prompt — must include the exact same outfit described","kling":"KLING3 prompt"}`;
