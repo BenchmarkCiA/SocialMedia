@@ -312,7 +312,10 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 
   <div class="topbar">
     <div class="topbar-logo">Mika Studio</div>
-    <button class="gear-btn" onclick="openModal()">⚙ Settings</button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="model-indicator" style="font-size:10px;color:var(--text3);font-weight:500;"></span>
+      <button class="gear-btn" onclick="openModal()">⚙ Settings</button>
+    </div>
   </div>
 
   <div class="tabs">
@@ -689,6 +692,26 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
     </div>
     <div class="divider"></div>
     <div>
+      <div class="lbl">AI Model</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border-radius:var(--r);border:1px solid var(--border);transition:border-color .2s;" id="model-sonnet-row">
+          <input type="radio" name="model-choice" value="sonnet" style="margin-top:2px;flex-shrink:0;">
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);">⚡ Best quality — Sonnet</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">Slower, costs more. Best for complex prompts.</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border-radius:var(--r);border:1px solid var(--border);transition:border-color .2s;" id="model-haiku-row">
+          <input type="radio" name="model-choice" value="haiku" style="margin-top:2px;flex-shrink:0;">
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text);">🚀 Fast &amp; cheap — Haiku</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">~10x cheaper. Image analysis always uses Sonnet regardless.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div>
       <div class="lbl">Character description</div>
       <textarea class="field" id="m-char" rows="4">A 175cm tall young woman in her mid-20s with long straight blonde hair with lighter highlights, bright blue eyes, light skin with very subtle freckles scattered across the nose and cheeks, soft facial features, full natural lips, slender supermodel build, no heavy makeup — natural effortless look. She is Israeli. When holding her phone: modern iPhone space gray, slim dark navy matte case, no logos.</textarea>
     </div>
@@ -713,6 +736,12 @@ textarea.field{resize:vertical;min-height:72px;line-height:1.5;}
 <script>
 // ── STATE ────────────────────────────────────────────────
 let KEY = '';
+let USE_HAIKU = localStorage.getItem('ms_use_haiku') === 'true';
+const MODEL_SONNET = 'claude-sonnet-4-20250514';
+const MODEL_HAIKU  = 'claude-haiku-4-5-20251001';
+function getModel(forceQuality) {
+  return (!forceQuality && USE_HAIKU) ? MODEL_HAIKU : MODEL_SONNET;
+}
 let dailyScene = 'bedroom';
 let dailyMode = 'natural';
 let hasbaraMode = 'natural';
@@ -914,6 +943,12 @@ function showApp() {
   document.getElementById('setup').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   document.getElementById('m-key').value = KEY;
+  updateModelIndicator();
+}
+
+function updateModelIndicator() {
+  const el = document.getElementById('model-indicator');
+  if (el) el.textContent = USE_HAIKU ? '🚀 Haiku' : '⚡ Sonnet';
 }
 
 function loadSettings() {
@@ -923,6 +958,10 @@ function loadSettings() {
   const lang = localStorage.getItem('ms_lang') || 'english';
   const r = document.querySelector(`input[name=lang][value="${lang}"]`);
   if (r) r.checked = true;
+  // Restore model choice
+  const savedModel = localStorage.getItem('ms_use_haiku') === 'true' ? 'haiku' : 'sonnet';
+  const mr = document.querySelector(`input[name="model-choice"][value="${savedModel}"]`);
+  if (mr) mr.checked = true;
 }
 
 // ── BUILD CHIPS ──────────────────────────────────────────
@@ -998,10 +1037,10 @@ function clearR(tab) {
 }
 
 // ── API ──────────────────────────────────────────────────
-async function api(system, user, useSearch = false) {
+async function api(system, user, useSearch = false, forceQuality = false) {
   const body = {
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
+    model: getModel(forceQuality),
+    max_tokens: 2000,
     system,
     messages: [{ role: 'user', content: user }]
   };
@@ -1044,8 +1083,8 @@ async function apiWithImage(system, userText, b64, mtype) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      model: MODEL_SONNET,
+      max_tokens: 3000,
       system,
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: mtype, data: b64 } },
@@ -1506,7 +1545,7 @@ Return JSON only:
       const res2 = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, system:transSystem, messages })
+        body: JSON.stringify({ model:MODEL_SONNET, max_tokens:2000, system:transSystem, messages })
       });
       if (!res2.ok) { const e = await res2.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+res2.status); }
       const d2 = await res2.json();
@@ -1532,7 +1571,7 @@ Return JSON only:
       const res3 = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:3000, system:oneImgSystem, messages })
+        body: JSON.stringify({ model:MODEL_SONNET, max_tokens:3000, system:oneImgSystem, messages })
       });
       if (!res3.ok) { const e = await res3.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+res3.status); }
       const d3 = await res3.json();
@@ -1831,11 +1870,17 @@ function closeModal(e) { if (e.target.id === 'modal') document.getElementById('m
 function saveSettings() {
   const k = document.getElementById('m-key').value.trim();
   if (k) { KEY = k; localStorage.setItem('ms_key', k); }
+  const modelChoice = document.querySelector('input[name="model-choice"]:checked')?.value;
+  if (modelChoice) {
+    USE_HAIKU = modelChoice === 'haiku';
+    localStorage.setItem('ms_use_haiku', USE_HAIKU);
+  }
   const map = [['m-char','ms_char'],['m-bed','ms_bed'],['m-kit','ms_kit'],['m-sal','ms_sal'],['m-bath','ms_bath']];
   map.forEach(([id,key]) => localStorage.setItem(key, document.getElementById(id).value.trim()));
   const lang = document.querySelector('input[name=lang]:checked')?.value || 'english';
   localStorage.setItem('ms_lang', lang);
   document.getElementById('modal').classList.remove('open');
+  updateModelIndicator();
   toast('Settings saved ✓');
 }
 
